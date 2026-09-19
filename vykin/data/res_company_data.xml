@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="base.main_company" model="res.company">
+            <field name="name">Vykin</field>
+            <field name="street">Héroes número 722, Loft 214, Colonia La Magdalena Ocotitlán, Municipio de Metepec, Estado de México,</field>
+            <field name="zip">52161</field>
+            <field name="country_id" ref="base.mx"/>
+            <field name="state_id" search="[('country_id.code', '=', 'MX'), ('code', '=', 'MEX')]"/>
+            <field name="website">https://vykin.tech/</field>
+            <field name="logo" type="bytes" file="vykin/static/img/logo.jpg"/>
+        </record>
+    </data>
+</odoo>
