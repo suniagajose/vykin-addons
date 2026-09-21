@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="project_task_action_create_mcp" model="ir.actions.server">
+        <field name="name">AI Tool: Crear tarea de proyecto</field>
+        <field name="ai_tool_name">create_project_task</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="use_in_ai" eval="True"/>
+        <field name="use_in_mcp" eval="True"/>
+        <field name="is_readonly" eval="False"/>
+        <field name="ai_tool_description">Crea una tarea en un proyecto de Odoo. Requiere el título y el ID del proyecto (buscarlo con ai_tool_search sobre project.project); la descripción y la tarea padre son opcionales. Pide confirmación al usuario antes de llamarla.</field>
+        <field name="ai_tool_schema"><![CDATA[{
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Título de la tarea"
+        },
+        "project_id": {
+            "type": "integer",
+            "description": "ID del proyecto (buscarlo con ai_tool_search sobre project.project)"
+        },
+        "description": {
+            "type": "string",
+            "maxLength": 20000,
+            "description": "Descripción de la tarea (opcional)"
+        },
+        "parent_id": {
+            "type": "integer",
+            "description": "ID de la tarea padre (opcional; buscarla con ai_tool_search sobre project.task)"
+        }
+    },
+    "required": [
+        "name",
+        "project_id"
+    ]
+}]]></field>
+        <!-- server action code is run with safe_eval(code.strip()) without dedent: keep it at column 0 -->
+        <field name="code"><![CDATA[vals = {
+  'name': name,
+  'project_id': project_id,
+  'description': description or False,
+}
+if parent_id:
+    parent = env['project.task'].search([('id', '=', parent_id), ('project_id', '!=', False)])
+    if not parent:
+        raise UserError("No existe una tarea de proyecto con id %s para usar como padre." % parent_id)
+    vals['parent_id'] = parent.id
+task = env['project.task'].create(vals)
+ai['result'] = {'id': task.id, 'name': task.name, 'parent_id': task.parent_id.id or False}]]></field>
+    </record>
+
+    <record id="project_task_action_update_mcp" model="ir.actions.server">
+        <field name="name">AI Tool: Actualizar tarea de proyecto</field>
+        <field name="ai_tool_name">update_project_task</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="use_in_ai" eval="True"/>
+        <field name="use_in_mcp" eval="True"/>
+        <field name="is_readonly" eval="False"/>
+        <field name="ai_tool_description">Actualiza una tarea existente de un proyecto de Odoo. Requiere task_id y al menos un campo a cambiar (título, descripción, prioridad, estado, fecha límite, asignados o tarea padre); los campos omitidos no se modifican. Pide confirmación al usuario antes de llamarla.</field>
+        <field name="ai_tool_schema"><![CDATA[{
+    "type": "object",
+    "properties": {
+        "task_id": {
+            "type": "integer",
+            "description": "ID de la tarea a actualizar (buscarla con ai_tool_search sobre project.task). Solo tareas que pertenecen a un proyecto."
+        },
+        "name": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Nuevo título (omitir para no cambiarlo)"
+        },
+        "description": {
+            "type": "string",
+            "maxLength": 20000,
+            "description": "Nueva descripción, reemplaza la anterior (omitir para no cambiarla)"
+        },
+        "priority": {
+            "type": "string",
+            "enum": [
+                "0",
+                "1",
+                "2",
+                "3"
+            ],
+            "description": "Prioridad: 0=Low priority; 1=Medium priority; 2=High priority; 3=Urgent"
+        },
+        "state": {
+            "type": "string",
+            "enum": [
+                "01_in_progress",
+                "02_changes_requested",
+                "03_approved",
+                "1_done",
+                "1_canceled",
+                "04_waiting_normal"
+            ],
+            "description": "Estado: 01_in_progress=In Progress; 02_changes_requested=Changes Requested; 03_approved=Approved; 1_done=Done; 1_canceled=Cancelled; 04_waiting_normal=Waiting"
+        },
+        "date_deadline": {
+            "type": "string",
+            "maxLength": 19,
+            "description": "Fecha límite en UTC, formato YYYY-MM-DD HH:MM:SS"
+        },
+        "user_ids": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            },
+            "description": "IDs de res.users asignados a la tarea; reemplaza a los actuales"
+        },
+        "parent_id": {
+            "type": "integer",
+            "description": "ID de la tarea padre (buscarla con ai_tool_search sobre project.task). 0 quita la tarea padre. Omitir para no cambiarla."
+        }
+    },
+    "required": [
+        "task_id"
+    ]
+}]]></field>
+        <!-- server action code is run with safe_eval(code.strip()) without dedent: keep it at column 0 -->
+        <field name="code"><![CDATA[task = env['project.task'].search([('id', '=', task_id), ('project_id', '!=', False)])
+if not task:
+    raise UserError("No existe una tarea de proyecto con id %s." % task_id)
+vals = {}
+if name is not None:
+    vals['name'] = name
+if description is not None:
+    vals['description'] = description
+if priority is not None:
+    vals['priority'] = priority
+if state is not None:
+    vals['state'] = state
+if date_deadline is not None:
+    vals['date_deadline'] = date_deadline
+if user_ids is not None:
+    vals['user_ids'] = [(6, 0, user_ids)]
+if parent_id is not None:
+    if parent_id == 0:
+        vals['parent_id'] = False
+    else:
+        parent = env['project.task'].search([('id', '=', parent_id), ('project_id', '!=', False)])
+        if not parent:
+            raise UserError("No existe una tarea de proyecto con id %s para usar como padre." % parent_id)
+        if parent == task:
+            raise UserError("Una tarea no puede ser su propia tarea padre.")
+        vals['parent_id'] = parent.id
+if not vals:
+    raise UserError("No se indicó ningún campo para actualizar.")
+updated = sorted(vals)
+task.write(vals)
+ai['result'] = {'id': task.id, 'name': task.name, 'updated': updated}]]></field>
+    </record>
+
+    <record id="knowledge_article_action_create_mcp" model="ir.actions.server">
+        <field name="name">AI Tool: Crear artículo de Knowledge</field>
+        <field name="ai_tool_name">create_knowledge_article</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="knowledge.model_knowledge_article"/>
+        <field name="use_in_ai" eval="True"/>
+        <field name="use_in_mcp" eval="True"/>
+        <field name="is_readonly" eval="False"/>
+        <field name="ai_tool_description">Crea un artículo en Knowledge (raíz o hijo de otro artículo). Requiere el título; el contenido, el padre, el emoji y si es privado son opcionales. El contenido va en HTML simple. Pide confirmación al usuario antes de llamarla.</field>
+        <field name="ai_tool_schema"><![CDATA[{
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Título del artículo"
+        },
+        "body": {
+            "type": "string",
+            "maxLength": 100000,
+            "description": "Contenido en HTML simple (h1-h3, p, ul/ol/li, strong, em, a, table). No usar Markdown. Opcional."
+        },
+        "parent_id": {
+            "type": "integer",
+            "description": "ID del artículo padre (debe poder editarse). Omitir para crear un artículo raíz. Buscarlo con ai_tool_search sobre knowledge.article."
+        },
+        "icon": {
+            "type": "string",
+            "maxLength": 8,
+            "description": "Emoji del artículo (opcional)"
+        },
+        "is_private": {
+            "type": "boolean",
+            "description": "true para crear un artículo privado (solo el usuario). Por defecto false (espacio de trabajo)."
+        }
+    },
+    "required": [
+        "name"
+    ]
+}]]></field>
+        <!-- server action code is run with safe_eval(code.strip()) without dedent: keep it at column 0 -->
+        <field name="code"><![CDATA[article = env['knowledge.article'].article_create(title=name, parent_id=parent_id or False, is_private=bool(is_private))
+vals = {}
+if body is not None:
+    vals['body'] = body
+if icon is not None:
+    vals['icon'] = icon
+if vals:
+    article.write(vals)
+ai['result'] = {'id': article.id, 'name': article.name, 'category': article.category, 'url': article.article_url}]]></field>
+    </record>
+
+    <record id="knowledge_article_action_update_mcp" model="ir.actions.server">
+        <field name="name">AI Tool: Actualizar artículo de Knowledge</field>
+        <field name="ai_tool_name">update_knowledge_article</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="knowledge.model_knowledge_article"/>
+        <field name="use_in_ai" eval="True"/>
+        <field name="use_in_mcp" eval="True"/>
+        <field name="is_readonly" eval="False"/>
+        <field name="ai_tool_description">Actualiza un artículo existente de Knowledge: título, contenido (reemplazar o añadir al final) y emoji. Requiere article_id y al menos un campo; los omitidos no cambian. El contenido va en HTML simple. Pide confirmación al usuario antes de llamarla.</field>
+        <field name="ai_tool_schema"><![CDATA[{
+    "type": "object",
+    "properties": {
+        "article_id": {
+            "type": "integer",
+            "description": "ID del artículo a actualizar (buscarlo con ai_tool_search sobre knowledge.article)"
+        },
+        "name": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Nuevo título (omitir para no cambiarlo)"
+        },
+        "body": {
+            "type": "string",
+            "maxLength": 100000,
+            "description": "Contenido en HTML simple (h1-h3, p, ul/ol/li, strong, em, a, table). No usar Markdown. Omitir para no cambiar el contenido."
+        },
+        "body_mode": {
+            "type": "string",
+            "enum": [
+                "replace",
+                "append"
+            ],
+            "description": "replace (por defecto) reemplaza todo el contenido; append lo añade al final."
+        },
+        "icon": {
+            "type": "string",
+            "maxLength": 8,
+            "description": "Nuevo emoji (omitir para no cambiarlo)"
+        }
+    },
+    "required": [
+        "article_id"
+    ]
+}]]></field>
+        <!-- server action code is run with safe_eval(code.strip()) without dedent: keep it at column 0 -->
+        <field name="code"><![CDATA[article = env['knowledge.article'].search([('id', '=', article_id), ('to_delete', '=', False)])
+if not article:
+    raise UserError("No existe un artículo activo con id %s." % article_id)
+if not article.user_can_write:
+    raise UserError("No tienes permiso para editar el artículo %s." % article_id)
+vals = {}
+if name is not None:
+    vals['name'] = name
+if body is not None:
+    if body_mode == 'append':
+        vals['body'] = str(article.body or '') + body
+    else:
+        vals['body'] = body
+if icon is not None:
+    vals['icon'] = icon
+if not vals:
+    raise UserError("No se indicó ningún campo para actualizar.")
+updated = sorted(vals)
+article.write(vals)
+ai['result'] = {'id': article.id, 'name': article.name, 'updated': updated, 'url': article.article_url}]]></field>
+    </record>
+</odoo>
