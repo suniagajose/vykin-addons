@@ -154,6 +154,42 @@ task.write(vals)
 ai['result'] = {'id': task.id, 'name': task.name, 'updated': updated}]]></field>
     </record>
 
+    <record id="project_task_action_post_note_mcp" model="ir.actions.server">
+        <field name="name">AI Tool: Publicar nota en tarea de proyecto</field>
+        <field name="ai_tool_name">post_project_task_note</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="use_in_ai" eval="True"/>
+        <field name="use_in_mcp" eval="True"/>
+        <field name="is_readonly" eval="False"/>
+        <field name="ai_tool_description">Publica una nota interna en el chatter de una tarea de proyecto de Odoo. No modifica la tarea, no envía correos y no añade seguidores. El contenido va en HTML simple. Pide confirmación al usuario antes de llamarla.</field>
+        <field name="ai_tool_schema"><![CDATA[{
+    "type": "object",
+    "properties": {
+        "task_id": {
+            "type": "integer",
+            "description": "ID de la tarea (buscarla con ai_tool_search sobre project.task). Solo tareas que pertenecen a un proyecto."
+        },
+        "body": {
+            "type": "string",
+            "maxLength": 20000,
+            "description": "Contenido de la nota en HTML simple (h1-h3, p, ul/ol/li, strong, em, a, table). No usar Markdown."
+        }
+    },
+    "required": [
+        "task_id",
+        "body"
+    ]
+}]]></field>
+        <!-- server action code is run with safe_eval(code.strip()) without dedent: keep it at column 0 -->
+        <!-- Markup is not in the eval context: body_is_html makes message_post keep the HTML (sanitized) -->
+        <field name="code"><![CDATA[task = env['project.task'].search([('id', '=', task_id), ('project_id', '!=', False)])
+if not task:
+    raise UserError("No existe una tarea de proyecto con id %s." % task_id)
+message = task.message_post(body=body, body_is_html=True, message_type='comment', subtype_xmlid='mail.mt_note')
+ai['result'] = {'id': task.id, 'name': task.name, 'message_id': message.id}]]></field>
+    </record>
+
     <record id="knowledge_article_action_create_mcp" model="ir.actions.server">
         <field name="name">AI Tool: Crear artículo de Knowledge</field>
         <field name="ai_tool_name">create_knowledge_article</field>

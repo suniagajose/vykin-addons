@@ -10,10 +10,10 @@ Installs the set of apps used by Vykin and configures its company:
 * Mexican accounting localization (``l10n_mx``).
 * Company name, address, website and logo.
 * AI: MCP tools (server actions exposed through ``ai_mcp``) to create and update
-  project tasks (with parent task) and Knowledge articles. They run with the
-  permissions of the user who owns the API key and none of them deletes or
-  archives records. Everything related to AI (MCP or not) lives in this module,
-  one data file per feature.
+  project tasks (with parent task), post internal notes on them, and create and
+  update Knowledge articles. They run with the permissions of the user who owns
+  the API key and none of them deletes or archives records. Everything related
+  to AI (MCP or not) lives in this module, one data file per feature.
 
 The database must be created with Mexico as country (MXN currency) *before*
 installing this module, so that the ``account`` module loads the Mexican
@@ -26,7 +26,7 @@ extension ``vector`` (pgvector) in the database *before* installing this module:
     'category': 'Vykin',
     'author': 'Vykin',
     'website': 'https://vykin.tech/',
-    'version': '20.0.1.1.0',
+    'version': '20.0.1.2.0',
     'license': 'LGPL-3',
     'application': True,
     'depends': [
