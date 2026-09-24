@@ -10,6 +10,8 @@ Custom Odoo modules for Vykin. Branch `20.0` targets Odoo 20.0.
   file per feature. Today: MCP tools (server actions exposed through `ai_mcp`)
   to create and update project tasks (with parent task), post internal notes on
   them, and create and update Knowledge articles.
+  When a survey participation generates a lead (`survey_crm`), the survey title and
+  answers are also logged as an internal note in the lead's chatter.
   The XML is the source of truth: upgrading the module overwrites manual edits of
   those actions. On a database where the tools were created by hand, the
   `20.0.1.1.0` upgrade adopts them (same `ai_tool_name`) instead of duplicating
