@@ -7,6 +7,8 @@ Base Vykin
 Installs the set of apps used by Vykin and configures its company:
 
 * CRM, Sales, Project, Surveys (with lead generation), Contacts and Calendar.
+* Surveys: when a participation generates a lead, the survey title and answers are
+  also logged as an internal note in the lead's chatter.
 * Mexican accounting localization (``l10n_mx``).
 * Company name, address, website and logo.
 * AI: MCP tools (server actions exposed through ``ai_mcp``) to create and update
