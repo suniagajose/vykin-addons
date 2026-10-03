@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="view_telegram_command_list" model="ir.ui.view">
+        <field name="name">telegram.command.list</field>
+        <field name="model">telegram.command</field>
+        <field name="arch" type="xml">
+            <list string="Telegram Commands" editable="bottom">
+                <field name="name" placeholder="/comando" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_telegram_command_form" model="ir.ui.view">
+        <field name="name">telegram.command.form</field>
+        <field name="model">telegram.command</field>
+        <field name="arch" type="xml">
+            <form string="Telegram Command">
+                <sheet>
+                    <group>
+                        <field name="name" placeholder="/comando" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_telegram_command" model="ir.actions.act_window">
+        <field name="name">Commands</field>
+        <field name="res_model">telegram.command</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Telegram command
+            </p>
+            <p>
+                Commands must start with "/" (e.g., /nueva)
+            </p>
+        </field>
+    </record>
+
+</odoo>

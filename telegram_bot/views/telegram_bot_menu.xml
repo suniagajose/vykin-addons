@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <menuitem
+        id="menu_telegram_root"
+        name="Telegram"
+        web_icon="telegram_bot,static/description/icon.png"
+        sequence="100"
+    />
+
+    <menuitem
+        id="menu_telegram_bots"
+        name="Bots"
+        parent="menu_telegram_root"
+        action="action_telegram_bot"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_telegram_chats"
+        name="Chats"
+        parent="menu_telegram_root"
+        action="action_telegram_chat"
+        sequence="12"
+    />
+
+    <menuitem
+        id="menu_telegram_messages"
+        name="Messages"
+        parent="menu_telegram_root"
+        action="action_telegram_message"
+        sequence="15"
+    />
+
+    <menuitem
+        id="menu_telegram_config"
+        name="Configuration"
+        parent="menu_telegram_root"
+        sequence="100"
+        groups="base.group_system"
+    />
+
+    <menuitem
+        id="menu_telegram_commands"
+        name="Commands"
+        parent="menu_telegram_config"
+        action="action_telegram_command"
+        sequence="10"
+    />
+
+</odoo>

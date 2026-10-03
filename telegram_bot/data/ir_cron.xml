@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo noupdate="1">
+
+    <record id="ir_cron_reset_stale_states" model="ir.cron">
+        <field name="name">Telegram: Reset Stale Chat States</field>
+        <field name="model_id" ref="model_telegram_chat" />
+        <field name="state">code</field>
+        <field name="code">model._cron_reset_stale_states()</field>
+        <field name="interval_number" eval="30" />
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="True" />
+    </record>
+
+</odoo>
