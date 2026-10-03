@@ -1,4 +1,5 @@
 import hashlib
+import json
 import logging
 import re
 import secrets
@@ -6,7 +7,7 @@ import secrets
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
-from ..tools import TelegramClient
+from ..tools import PROVIDERS, AiProvider, TelegramClient, provider_selection
 
 _logger = logging.getLogger(__name__)
 
@@ -50,6 +51,27 @@ class TelegramBot(models.Model):
         copy=False,
         help="SHA256 hash of the bot token, to find the bot from the webhook URL.",
     )
+    ai_provider = fields.Selection(
+        selection=provider_selection(),
+        string="AI Provider",
+        help="Vendor that transcribes voice notes and turns text into structured "
+        "data for this bot. Empty: the bot works without AI.",
+    )
+    ai_model = fields.Char(
+        string="AI Model",
+        help="Optional model override. Empty: the vendor's default model. Set it "
+        "when the vendor retires the default one.",
+    )
+    ai_api_key = fields.Char(
+        string="AI API Key",
+        copy=False,
+        groups="base.group_system",
+        help="API key of the selected vendor.",
+    )
+    ai_no_audio = fields.Boolean(
+        compute="_compute_ai_no_audio",
+        help="Technical field: the selected vendor cannot transcribe voice notes.",
+    )
 
     _token_hash_uniq = models.Constraint(
         "UNIQUE (token_hash)",
@@ -69,6 +91,12 @@ class TelegramBot(models.Model):
     def _compute_token_hash(self):
         for bot in self:
             bot.token_hash = bot.bot_token and self._hash_token(bot.bot_token)
+
+    @api.depends("ai_provider")
+    def _compute_ai_no_audio(self):
+        for bot in self:
+            spec = PROVIDERS.get(bot.ai_provider)
+            bot.ai_no_audio = bool(spec) and not spec.get("audio")
 
     @api.model
     def find_by_token(self, token):
@@ -132,6 +160,55 @@ class TelegramBot(models.Model):
                 self.env._("Bot '%(name)s' has no token configured.", name=self.name)
             )
         return TelegramClient(token)
+
+    def _get_ai_provider(self):
+        """Return the AI vendor transport configured on this bot.
+
+        :rtype: AiProvider
+        """
+        self.ensure_one()
+        # sudo: the API key is restricted to administrators, but the bot uses it
+        # while handling any user's message.
+        bot = self.sudo()
+        return AiProvider(bot.ai_provider, bot.ai_api_key, bot.ai_model)
+
+    def _ai_transcribe(self, audio_bytes, filename, language="es", prompt=None):
+        """Transcribe a voice note with the bot's AI vendor.
+
+        :param bytes audio_bytes: raw audio file content
+        :param str filename: file name, used to pick the audio mime type
+        :param str language: ISO language hint
+        :param str prompt: optional domain-vocabulary hint
+        :return: the transcript, or None when there is no vendor, no key, the
+            vendor cannot transcribe or the call fails
+        :rtype: str | None
+        """
+        return self._get_ai_provider().transcribe(
+            audio_bytes, filename, language=language, prompt=prompt
+        )
+
+    def _ai_chat_json(self, system, user, max_tokens=600, temperature=0.1):
+        """Ask the bot's AI vendor for a JSON object built from a text.
+
+        :param str system: instructions and the expected JSON schema
+        :param str user: text to act on
+        :param int max_tokens: completion cap
+        :param float temperature: sampling temperature
+        :return: the decoded JSON object, or None when there is no vendor or
+            key, the call fails or the answer is not a JSON object
+        :rtype: dict | None
+        """
+        content = self._get_ai_provider().chat_json(
+            system, user, max_tokens, temperature
+        )
+        if content is None:
+            return None
+        try:
+            data = json.loads(content)
+        except ValueError:
+            _logger.warning("Bot '%s': the AI answer is not valid JSON", self.name)
+            return None
+        return data if isinstance(data, dict) else None
 
     def _get_webhook_url(self):
         """Return the public URL Telegram must post this bot's updates to.

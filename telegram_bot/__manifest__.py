@@ -1,6 +1,6 @@
 {
     "name": "Telegram Bot",
-    "summary": "Telegram bot core: webhook, chats, messages, user linking, commands",
+    "summary": "Telegram bot core: webhook, chats, user linking, commands, AI service",
     "description": """
 Telegram Bot
 ============
@@ -21,6 +21,11 @@ flow modules (e.g. task creation) build on top of it.
 * Three permission levels: unlinked, linked contact, internal user. Commands of
   an internal user run with that user's access rights.
 * Commands: ``/start``, ``/ayuda``, ``/quiensoy``.
+* AI service: each bot picks a vendor (Groq, Google Gemini, OpenAI, DeepSeek,
+  Moonshot, Anthropic), an optional model and an API key visible only to
+  administrators. Flow modules call it to transcribe voice notes and to turn text
+  into a JSON object; any failure returns no result instead of an error. The form
+  warns when the vendor cannot transcribe.
     """,
     "category": "Productivity",
     "author": "Vykin",

@@ -51,6 +51,35 @@
                                 </list>
                             </field>
                         </page>
+                        <page string="AI" name="ai">
+                            <group>
+                                <group>
+                                    <field name="ai_provider" placeholder="No AI" />
+                                    <field
+                                        name="ai_model"
+                                        placeholder="vendor default"
+                                        invisible="not ai_provider"
+                                    />
+                                    <field
+                                        name="ai_api_key"
+                                        password="True"
+                                        groups="base.group_system"
+                                        invisible="not ai_provider"
+                                    />
+                                    <field name="ai_no_audio" invisible="1" />
+                                </group>
+                            </group>
+                            <div
+                                class="alert alert-warning"
+                                role="alert"
+                                invisible="not ai_no_audio"
+                            >
+                                <strong>This vendor cannot transcribe voice notes.</strong>
+                                Voice notes sent to this bot cannot be turned into
+                                text. Pick Groq, OpenAI or Google Gemini to accept
+                                them.
+                            </div>
+                        </page>
                     </notebook>
                 </sheet>
             </form>
