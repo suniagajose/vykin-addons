@@ -145,6 +145,7 @@ class TelegramChat(models.Model):
             _logger.info("Created telegram.chat %s for bot '%s'", chat.id, bot.name)
         return chat
 
+    @api.private
     def increment_failed_state(self, error_msg):
         """Increment the failed-command count and store the last error.
 
@@ -157,11 +158,13 @@ class TelegramChat(models.Model):
             },
         )
 
+    @api.private
     def reset_failed_state(self):
         """Reset the failed-command count after a successful command."""
         if self.failed_command_count or self.last_error:
             self.sudo().write({"failed_command_count": 0, "last_error": False})
 
+    @api.private
     def transition_to(self, new_state, context=None):
         """Transition the chat to ``new_state``, optionally storing context.
 
@@ -199,6 +202,7 @@ class TelegramChat(models.Model):
         )
         return True
 
+    @api.private
     def get_context(self, key, default=None):
         """Return the value stored in the context data for ``key``.
 
@@ -209,6 +213,7 @@ class TelegramChat(models.Model):
         self.ensure_one()
         return (self.context_data or {}).get(key, default)
 
+    @api.private
     def set_context(self, key, value):
         """Store ``value`` under ``key`` in the context data.
 
@@ -248,12 +253,14 @@ class TelegramChat(models.Model):
         """
         return {"state": "idle", "context_data": {}}
 
+    @api.private
     def reset_conversation(self):
         """Reset every chat in ``self`` to idle, discarding all flow drafts."""
         # sudo: handlers run as the linked user, who cannot write on
         # telegram.chat; the chat session is a technical record owned by the bot.
         self.sudo().write(self._reset_conversation_vals())
 
+    @api.private
     def clear_context(self):
         """Clear all conversation context and return to idle state."""
         self.ensure_one()
