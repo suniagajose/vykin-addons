@@ -5,7 +5,7 @@ import re
 import secrets
 
 from odoo import api, fields, models
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import AccessError, UserError, ValidationError
 
 from ..tools import PROVIDERS, AiProvider, TelegramClient, provider_selection
 
@@ -98,6 +98,7 @@ class TelegramBot(models.Model):
             spec = PROVIDERS.get(bot.ai_provider)
             bot.ai_no_audio = bool(spec) and not spec.get("audio")
 
+    @api.private
     @api.model
     def find_by_token(self, token):
         """Find a bot by token using an indexed hash lookup.
@@ -223,9 +224,16 @@ class TelegramBot(models.Model):
 
         :return: a notification action
         :rtype: dict
+        :raises AccessError: if the user is not an administrator
         :raises UserError: if Telegram rejects the registration
         """
         self.ensure_one()
+        # The button is shown to administrators only, but the method is
+        # reachable over RPC and runs with sudo below.
+        if not self.env.is_system():
+            raise AccessError(
+                self.env._("Only administrators can register a bot's webhook.")
+            )
         bot = self.sudo()
         if not bot.webhook_secret:
             bot.webhook_secret = secrets.token_urlsafe(32)
@@ -281,6 +289,7 @@ class TelegramBot(models.Model):
             vals["caption"] = caption
         return self.env["telegram.message"].sudo().create(vals)
 
+    @api.private
     def get_file_content(self, file_id):
         """Download the content of a file given its Telegram file ID.
 
@@ -295,6 +304,7 @@ class TelegramBot(models.Model):
             _logger.error("Failed to download file for bot '%s': %s", self.name, e)
             return False
 
+    @api.private
     def get_markdown_helpers(self):
         """Return Telegram Markdown formatting helpers for consistent styling.
 
@@ -354,6 +364,7 @@ class TelegramBot(models.Model):
             telegram_message.write({"state": "error", "error_message": error[:255]})
         return response
 
+    @api.private
     def send_document(self, chat_id, document_content, filename, caption=None):
         """Send a document to a chat through the Telegram Bot API.
 
@@ -373,6 +384,7 @@ class TelegramBot(models.Model):
             caption=caption,
         )
 
+    @api.private
     def send_message(self, chat_id, text, reply_markup=None, parse_mode="Markdown"):
         """Send a text message to a chat through the Telegram Bot API.
 
@@ -392,6 +404,7 @@ class TelegramBot(models.Model):
             reply_markup=reply_markup,
         )
 
+    @api.private
     def answer_callback_query(self, callback_query_id, text=None, show_alert=False):
         """Answer a callback query, clearing the loading indicator on the button.
 
@@ -409,6 +422,7 @@ class TelegramBot(models.Model):
             _logger.exception("Failed to answer callback query %s", callback_query_id)
             return False
 
+    @api.private
     def edit_message_reply_markup(self, chat_id, message_id, reply_markup=None):
         """Replace an existing message's inline keyboard in place.
 

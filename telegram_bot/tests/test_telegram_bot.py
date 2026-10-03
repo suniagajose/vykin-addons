@@ -4,6 +4,7 @@ from unittest.mock import Mock
 import requests
 
 from odoo.exceptions import AccessError, UserError
+from odoo.models import get_public_method
 from odoo.tests import TransactionCase, new_test_user
 
 from ..tools import TelegramApiError, TelegramClient, TelegramTokenFilter
@@ -57,6 +58,40 @@ class TestTelegramBot(TelegramBotTestMixin, TransactionCase):
                 bot.read([field])
         with self.assertRaises(AccessError):
             self.user.partner_id.with_user(user).write({"telegram_user_id": "123"})
+
+    def test_helpers_not_callable_over_rpc(self):
+        # They run with sudo, so over RPC any user could message any chat or
+        # rewrite any conversation as the bot.
+        for model, names in {
+            "telegram.bot": (
+                "find_by_token",
+                "get_file_content",
+                "get_markdown_helpers",
+                "send_document",
+                "send_message",
+                "answer_callback_query",
+                "edit_message_reply_markup",
+            ),
+            "telegram.chat": (
+                "increment_failed_state",
+                "reset_failed_state",
+                "transition_to",
+                "get_context",
+                "set_context",
+                "reset_conversation",
+                "clear_context",
+            ),
+        }.items():
+            for name in names:
+                with self.subTest(method=f"{model}.{name}"):
+                    with self.assertRaises(AccessError):
+                        get_public_method(self.env[model], name)
+
+    def test_register_webhook_restricted_to_administrators(self):
+        user = new_test_user(self.env, login="employee", groups="base.group_user")
+        with self.assertRaises(AccessError):
+            self.bot.with_user(user).action_register_webhook()
+        self.api_post.assert_not_called()
 
     def test_client_error_does_not_leak_token(self):
         self.api_post.side_effect = requests.ConnectionError(
