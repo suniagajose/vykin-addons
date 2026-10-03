@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo noupdate="1">
+
+    <!-- Enable it on a bot to let its users create tasks, with the command or
+         by just sending a message. -->
+    <record id="command_nueva" model="telegram.command">
+        <field name="name">/nueva</field>
+    </record>
+
+</odoo>
