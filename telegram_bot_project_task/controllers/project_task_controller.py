@@ -117,7 +117,9 @@ class ProjectTaskTelegramController(TelegramController):
             if step == "gathering":
                 self._capture_input(bot, chat, message)
             elif step in ("edit_title", "edit_desc"):
-                self._capture_edit(bot, chat, message, bot.env(user=internal_user))
+                self._capture_edit(
+                    bot, chat, message, self._env_as_user(bot, internal_user)
+                )
             else:
                 self._send(
                     bot, chat, "<i>Usa los botones del último mensaje para seguir.</i>"
@@ -161,7 +163,7 @@ class ProjectTaskTelegramController(TelegramController):
             )
             return
         action = data[len(_PREFIX) :]
-        env = bot.env(user=internal_user)
+        env = self._env_as_user(bot, internal_user)
         if action == "continue":
             self._continue(bot, chat, env)
         elif action == "discard":
@@ -460,6 +462,13 @@ class ProjectTaskTelegramController(TelegramController):
                     }
                 )
         except AccessError:
+            # Ids only: the error text can quote the user's draft.
+            _logger.info(
+                "Chat %s: user %s may not create a task in project %s",
+                chat.id,
+                user.id,
+                project.id,
+            )
             # The draft stays: the user can pick another project.
             self._send(
                 bot,
