@@ -187,6 +187,26 @@ class TelegramController(http.Controller):
         )
         return chat, partner, internal_user
 
+    def _env_as_user(self, bot, internal_user):
+        """Return an environment acting as the linked internal user.
+
+        The webhook request runs as the public user, who is also the
+        transaction's origin user. Odoo falls back to that origin user when it
+        writes relations to models that refuse sudo commands (res.users, via
+        ``_allow_sudo_commands``), so ``bot.env(user=...)`` alone would write
+        a task's assignees as public and fail. ``request.update_env`` moves the
+        origin user too. Without a request (direct calls) there is none to move.
+
+        :param bot: telegram.bot record
+        :param internal_user: linked internal res.users record
+        :return: environment of the internal user, without superuser mode
+        :rtype: odoo.api.Environment
+        """
+        if request:
+            request.update_env(user=internal_user)
+            return request.env
+        return bot.env(user=internal_user)
+
     def _sanitize_message_text(self, text):
         """Strip non-breaking spaces, collapse whitespace, trim trailing punctuation.
 
@@ -349,7 +369,7 @@ class TelegramController(http.Controller):
         # records are re-bound to an env acting as the user (not superuser).
         handler_bot, handler_chat, handler_partner = bot, chat, partner
         if internal_user:
-            env_as_user = bot.env(user=internal_user)
+            env_as_user = self._env_as_user(bot, internal_user)
             handler_bot = bot.with_env(env_as_user)
             handler_chat = chat.with_env(env_as_user)
             handler_partner = partner.with_env(env_as_user)
@@ -573,6 +593,15 @@ class TelegramController(http.Controller):
         active_flow = chat._get_active_flow()
         if active_flow:
             self._send_flow_busy_notice(bot, chat, active_flow, trigger="message")
+            return
+        if not partner:
+            # Flow modules only serve linked users: tell an unlinked one how to
+            # get linked instead of pointing them at commands they cannot use.
+            bot.send_message(
+                chat.chat_id,
+                "Tu cuenta de Telegram no está vinculada con Odoo. Escribe /start "
+                "para ver tu ID de Telegram y pídele al administrador que lo vincule.",
+            )
             return
         bot.send_message(
             chat.chat_id,

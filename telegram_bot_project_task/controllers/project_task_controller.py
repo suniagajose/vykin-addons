@@ -117,7 +117,9 @@ class ProjectTaskTelegramController(TelegramController):
             if step == "gathering":
                 self._capture_input(bot, chat, message)
             elif step in ("edit_title", "edit_desc"):
-                self._capture_edit(bot, chat, message, bot.env(user=internal_user))
+                self._capture_edit(
+                    bot, chat, message, self._env_as_user(bot, internal_user)
+                )
             else:
                 self._send(
                     bot, chat, "<i>Usa los botones del último mensaje para seguir.</i>"
@@ -145,7 +147,11 @@ class ProjectTaskTelegramController(TelegramController):
         # superuser environment: only the linked internal user may act on it.
         if not internal_user:
             self._send(
-                bot, chat, "Para crear tareas tu cuenta de Odoo debe estar vinculada."
+                bot,
+                chat,
+                "Para crear tareas necesitas un usuario de Odoo vinculado. Escribe "
+                "/start para ver tu ID de Telegram y pídele al administrador que lo "
+                "vincule.",
             )
             return
         ctx = chat.context_data or {}
@@ -157,7 +163,7 @@ class ProjectTaskTelegramController(TelegramController):
             )
             return
         action = data[len(_PREFIX) :]
-        env = bot.env(user=internal_user)
+        env = self._env_as_user(bot, internal_user)
         if action == "continue":
             self._continue(bot, chat, env)
         elif action == "discard":
@@ -341,6 +347,17 @@ class ProjectTaskTelegramController(TelegramController):
             self._send(bot, chat, "🚫 No tienes acceso a ese proyecto.")
             return
         ctx = dict(chat.context_data or {})
+        # A project button left over from an earlier draft can reach a flow
+        # that has nothing yet: there is no story to draft from.
+        if "title" not in ctx and not (ctx.get("narrative") or "").strip():
+            self._send(
+                bot,
+                chat,
+                "<i>Todavía no me has contado nada. Escribe o manda una nota de "
+                "voz.</i>",
+                _continue_keyboard(),
+            )
+            return
         ctx["project_id"] = project.id
         if "title" not in ctx:
             ctx.update(self._draft(bot, ctx.get("narrative") or ""))
@@ -431,7 +448,15 @@ class ProjectTaskTelegramController(TelegramController):
     def _create_task(self, bot, chat, env, user):
         """Create the task as the user, attach the photos and send the link."""
         ctx = chat.context_data or {}
-        if not ctx.get("project_id") or not ctx.get("title"):
+        if not ctx.get("title"):
+            self._send(
+                bot,
+                chat,
+                "<i>Primero cuéntame qué hay que hacer y toca Continuar.</i>",
+                _continue_keyboard(),
+            )
+            return
+        if not ctx.get("project_id"):
             self._send(bot, chat, "<i>Primero elige el proyecto.</i>")
             return
         # Without a project the task would be created as a private one.
@@ -456,6 +481,13 @@ class ProjectTaskTelegramController(TelegramController):
                     }
                 )
         except AccessError:
+            # Ids only: the error text can quote the user's draft.
+            _logger.info(
+                "Chat %s: user %s may not create a task in project %s",
+                chat.id,
+                user.id,
+                project.id,
+            )
             # The draft stays: the user can pick another project.
             self._send(
                 bot,

@@ -211,12 +211,16 @@ class TestTaskFlow(TelegramBotTestMixin, TransactionCase):
     # Only a linked internal user gets the flow.
 
     def test_unlinked_or_portal_user_gets_no_flow(self):
-        for telegram_id in (UNLINKED_TELEGRAM_ID, PORTAL_TELEGRAM_ID):
+        for telegram_id, answer in (
+            (UNLINKED_TELEGRAM_ID, "Escribe /start"),
+            (PORTAL_TELEGRAM_ID, "Solo puedo procesar comandos"),
+        ):
             with self.subTest(telegram_id=telegram_id):
                 self._voice(from_id=telegram_id)
                 self.assertEqual(self._chat(telegram_id).state, "idle")
+                self.assertIn(answer, self._sent_texts()[-1])
                 self._press("create", from_id=telegram_id)
-                self.assertIn("debe estar vinculada", self._sent_texts()[-1])
+                self.assertIn("Escribe /start", self._sent_texts()[-1])
         self.transcribe.assert_not_called()
         self.assertFalse(self.env["project.task"].search([("name", "=", "dictado")]))
 
@@ -231,3 +235,19 @@ class TestTaskFlow(TelegramBotTestMixin, TransactionCase):
         chat = self._chat()
         self.assertEqual(chat.state, "awaiting_input")
         self.assertEqual(chat.context_data["narrative"], "Llamar al cliente")
+
+    # Buttons left over from an earlier draft reach a flow with nothing yet.
+
+    def test_stale_project_button_on_empty_flow_drafts_nothing(self):
+        self._message(text="/nueva")
+        self._press(f"project:{self.project.id}")
+        chat = self._chat()
+        self.assertNotIn("title", chat.context_data)
+        self.assertIn("Todavía no me has contado nada", self._sent_texts()[-1])
+        self.chat_json.assert_not_called()
+
+    def test_stale_create_button_on_empty_flow_asks_for_the_story(self):
+        self._message(text="/nueva")
+        self._press("create")
+        self.assertIn("Primero cuéntame qué hay que hacer", self._sent_texts()[-1])
+        self.assertFalse(self._tasks())
