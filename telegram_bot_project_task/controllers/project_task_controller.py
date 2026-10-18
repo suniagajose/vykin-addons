@@ -145,7 +145,11 @@ class ProjectTaskTelegramController(TelegramController):
         # superuser environment: only the linked internal user may act on it.
         if not internal_user:
             self._send(
-                bot, chat, "Para crear tareas tu cuenta de Odoo debe estar vinculada."
+                bot,
+                chat,
+                "Para crear tareas necesitas un usuario de Odoo vinculado. Escribe "
+                "/start para ver tu ID de Telegram y pídele al administrador que lo "
+                "vincule.",
             )
             return
         ctx = chat.context_data or {}

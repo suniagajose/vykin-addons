@@ -574,6 +574,15 @@ class TelegramController(http.Controller):
         if active_flow:
             self._send_flow_busy_notice(bot, chat, active_flow, trigger="message")
             return
+        if not partner:
+            # Flow modules only serve linked users: tell an unlinked one how to
+            # get linked instead of pointing them at commands they cannot use.
+            bot.send_message(
+                chat.chat_id,
+                "Tu cuenta de Telegram no está vinculada con Odoo. Escribe /start "
+                "para ver tu ID de Telegram y pídele al administrador que lo vincule.",
+            )
+            return
         bot.send_message(
             chat.chat_id,
             ("Solo puedo procesar comandos. Escribe /ayuda para ver la lista."),
