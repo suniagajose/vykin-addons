@@ -56,7 +56,8 @@ class TestAiProvider(TransactionCase):
         """Reasoning vendors lift the caller's token cap to their floor."""
         self.assertEqual(AiProvider("moonshot", "key")._token_budget(600), 2000)
         self.assertEqual(AiProvider("moonshot", "key")._token_budget(4000), 4000)
-        self.assertEqual(AiProvider("groq", "key")._token_budget(600), 600)
+        self.assertEqual(AiProvider("groq", "key")._token_budget(600), 2000)
+        self.assertEqual(AiProvider("openai", "key")._token_budget(600), 600)
 
     @staticmethod
     def _sent_body(provider_code, max_tokens=600, temperature=0.1):
@@ -88,7 +89,7 @@ class TestAiProvider(TransactionCase):
             "the 0.1 the caller asked for.",
         )
         self.assertEqual(
-            self._sent_body("groq", temperature=0.1)["temperature"],
+            self._sent_body("openai", temperature=0.1)["temperature"],
             0.1,
             "A vendor without an override must not alter the caller's value.",
         )
@@ -102,7 +103,7 @@ class TestAiProvider(TransactionCase):
             "returns empty content.",
         )
         self.assertEqual(
-            self._sent_body("groq", max_tokens=600)["max_tokens"],
+            self._sent_body("openai", max_tokens=600)["max_tokens"],
             600,
             "A vendor without a floor must keep the caller's cap.",
         )

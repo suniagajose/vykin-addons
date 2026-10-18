@@ -54,7 +54,12 @@ PROVIDERS = {
         "label": "Groq",
         "wire": "openai",
         "chat_url": "https://api.groq.com/openai/v1/chat/completions",
-        "chat_model": "llama-3.3-70b-versatile",
+        # Groq retired llama-3.3-70b-versatile (HTTP 404, 2026-10-18). This
+        # reasoning model spent ~155 of a 600-token cap thinking on a task
+        # dictation; "low" brings that to ~26 and the floor keeps headroom.
+        "chat_model": "openai/gpt-oss-120b",
+        "extra": {"reasoning_effort": "low"},
+        "min_max_tokens": 2000,
         "audio": "whisper",
         "audio_url": "https://api.groq.com/openai/v1/audio/transcriptions",
         "audio_model": "whisper-large-v3-turbo",
