@@ -15,8 +15,10 @@ A linked internal user creates a project task by talking to the bot.
 * The AI proposes a title and a description; without AI, or when its answer is
   not valid, the draft is built from the user's own text.
 * The user creates, edits the title or the description, changes the project or
-  discards. The task is created with the user's access rights, assigned to
-  them, with the photos attached, and the bot answers with a link to it.
+  discards. A button left over from an earlier draft, pressed while the new flow
+  has nothing yet, asks for the story instead of drafting an empty task. The
+  task is created with the user's access rights, assigned to them, with the
+  photos attached, and the bot answers with a link to it.
 * Per bot: default project and a glossary of terms that guides the
   transcription and the drafting.
     """,

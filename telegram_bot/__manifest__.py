@@ -17,15 +17,19 @@ flow modules (e.g. task creation) build on top of it.
 * Linking: a private chat is linked to the contact whose *Telegram user ID*
   (set by an administrator) equals the sender's numeric Telegram ID. The
   @username is never used to link: anyone can take a freed one. ``/start``
-  shows an unlinked user their ID so they can ask for the link.
+  shows an unlinked user their ID so they can ask for the link, and any other
+  message from them explains how to get linked.
 * Three permission levels: unlinked, linked contact, internal user. Commands of
-  an internal user run with that user's access rights.
+  an internal user run with that user's access rights. Through the public
+  webhook the switch also moves the transaction's origin user, which Odoo checks
+  when writing relations to users.
 * Commands: ``/start``, ``/ayuda``, ``/quiensoy``.
 * AI service: each bot picks a vendor (Groq, Google Gemini, OpenAI, DeepSeek,
-  Moonshot, Anthropic), an optional model and an API key visible only to
-  administrators. Flow modules call it to transcribe voice notes and to turn text
-  into a JSON object; any failure returns no result instead of an error. The form
-  warns when the vendor cannot transcribe.
+  Moonshot, Anthropic), an optional model, which replaces the vendor's default
+  when the vendor retires it, and an API key visible only to administrators.
+  Flow modules call it to transcribe voice notes and to turn text into a JSON
+  object; any failure returns no result instead of an error. The form warns when
+  the vendor cannot transcribe.
     """,
     "category": "Productivity",
     "author": "Vykin",
