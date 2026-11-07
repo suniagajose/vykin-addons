@@ -11,6 +11,8 @@ Installs the set of apps used by Vykin and configures its company:
   also logged as an internal note in the lead's chatter.
 * Mexican accounting localization (``l10n_mx``).
 * Company name, address, website and logo.
+* License: a server action to reset the license parameters, with the weekly
+  Publisher notification cron disabled so it does not overwrite them.
 * AI: MCP tools (server actions exposed through ``ai_mcp``) to create and update
   project tasks (with parent task), post internal notes on them, and create and
   update Knowledge articles. They run with the permissions of the user who owns
@@ -28,7 +30,7 @@ extension ``vector`` (pgvector) in the database *before* installing this module:
     'category': 'Vykin',
     'author': 'Vykin',
     'website': 'https://vykin.tech/',
-    'version': '20.0.1.2.0',
+    'version': '20.0.1.3.0',
     'license': 'LGPL-3',
     'application': True,
     'depends': [
@@ -48,5 +50,6 @@ extension ``vector`` (pgvector) in the database *before* installing this module:
     'data': [
         'data/res_company_data.xml',
         'data/ir_actions_server_data.xml',
+        'data/ir_cron_data.xml',
     ],
 }

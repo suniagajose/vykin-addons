@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="license_action_reset" model="ir.actions.server">
+        <field name="name">License</field>
+        <field name="model_id" ref="base.model_ir_config_parameter"/>
+        <field name="state">code</field>
+        <field name="code">env["ir.config_parameter"]._vykin_reset_license()</field>
+    </record>
+
     <record id="project_task_action_create_mcp" model="ir.actions.server">
         <field name="name">AI Tool: Crear tarea de proyecto</field>
         <field name="ai_tool_name">create_project_task</field>
