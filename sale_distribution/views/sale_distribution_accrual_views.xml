@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_distribution_accrual_view_list" model="ir.ui.view">
+        <field name="name">sale.distribution.accrual.list</field>
+        <field name="model">sale.distribution.accrual</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <field name="date"/>
+                <field name="order_id"/>
+                <field name="invoice_id"/>
+                <field name="payment_move_id"/>
+                <field name="distribution_id"/>
+                <field name="collected_untaxed_amount" sum="Total"/>
+                <field name="provision_move_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="sale_distribution_accrual_view_form" model="ir.ui.view">
+        <field name="name">sale.distribution.accrual.form</field>
+        <field name="model">sale.distribution.accrual</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" delete="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="order_id"/>
+                            <field name="invoice_id"/>
+                            <field name="payment_move_id"/>
+                            <field name="partial_reconcile_id"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="distribution_id"/>
+                            <field name="collected_untaxed_amount"/>
+                            <field name="provision_move_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="purchase_line_ids">
+                        <list>
+                            <field name="order_id"/>
+                            <field name="partner_id"/>
+                            <field name="name"/>
+                            <field name="price_subtotal"/>
+                            <field name="state"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="sale_distribution_accrual_view_search" model="ir.ui.view">
+        <field name="name">sale.distribution.accrual.search</field>
+        <field name="model">sale.distribution.accrual</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="order_id"/>
+                <field name="invoice_id"/>
+                <field name="payment_move_id"/>
+                <filter name="group_by_order" string="Sales Order" context="{'group_by': 'order_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="sale_distribution_accrual_action" model="ir.actions.act_window">
+        <field name="name">Provisioned Payments</field>
+        <field name="res_model">sale.distribution.accrual</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

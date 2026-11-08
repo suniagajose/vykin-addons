@@ -1,0 +1,16 @@
+from . import (
+    account_chart_template,
+    account_move,
+    account_move_line,
+    account_partial_reconcile,
+    product_template,
+    project_project,
+    purchase_order_line,
+    res_company,
+    res_config_settings,
+    sale_distribution,
+    sale_distribution_accrual,
+    sale_distribution_rule,
+    sale_distribution_salesperson,
+    sale_order,
+)

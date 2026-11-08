@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_distribution_settlement_view_form" model="ir.ui.view">
+        <field name="name">sale.distribution.settlement.form</field>
+        <field name="model">sale.distribution.settlement</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>
+                    This project still has provision balances. Move them to the expense accounts of
+                    their rules to archive it.
+                </p>
+                <group>
+                    <field name="project_id"/>
+                    <field name="summary" nolabel="1" colspan="2"/>
+                </group>
+                <footer>
+                    <button name="action_settle" type="object" string="Move to Expenses and Archive" class="btn-primary"/>
+                    <button special="cancel" string="Cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

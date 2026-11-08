@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_order_form" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.sale_distribution</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_view_distribution_accruals" type="object" class="oe_stat_button" icon="fa-pie-chart"
+                    invisible="not distribution_accrual_count">
+                    <field name="distribution_accrual_count" widget="statinfo" string="Provisioned"/>
+                </button>
+                <button name="action_view_distribution_analytic" type="object" class="oe_stat_button" icon="fa-bar-chart"
+                    string="Analytic Report" invisible="not project_account_id"
+                    groups="analytic.group_analytic_accounting"/>
+            </div>
+            <group name="sales_person" position="after">
+                <group name="distribution" string="Distribution">
+                    <field name="distribution_registered" invisible="1"/>
+                    <field name="project_account_id" invisible="1"/>
+                    <field name="distribution_id" readonly="distribution_registered"/>
+                    <field name="distribution_salesperson_ids" nolabel="1" colspan="2" invisible="not distribution_id">
+                        <list editable="bottom">
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                            <field name="percentage"/>
+                        </list>
+                    </field>
+                </group>
+            </group>
+        </field>
+    </record>
+
+</odoo>
