@@ -1,0 +1,919 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sale_distribution
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-14 04:41+0000\n"
+"PO-Revision-Date: 2026-11-14 04:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: sale_distribution
+#: model:ir.module.module,description:base.module_sale_distribution
+msgid ""
+"\n"
+"Sale Distribution\n"
+"=================\n"
+"Splits what each customer payment of an implementation sale brings in, following a\n"
+"distribution scheme chosen on the sales order (standard: 20% salespeople, 75%\n"
+"implementation, 5% company).\n"
+"\n"
+"* Nothing is recorded when the invoice is posted. Each payment reconciled with the\n"
+"  invoice records its base and a provision entry with the analytic account of the\n"
+"  order's project: the salesperson share on behalf of each salesperson, the\n"
+"  implementation share without partner. The company share stays in income.\n"
+"* Each salesperson gets a request for quotation of a *Sales Commission* for what was\n"
+"  provisioned on their behalf; the vendor bill consumes the provision.\n"
+"* A vendor bill against a provision account cannot exceed the provision balance of its\n"
+"  analytic account (and of the vendor, for commissions).\n"
+"* Unreconciled payments and credit notes are corrected with reversal entries;\n"
+"  provision entries are never edited. A project with a provision balance is not\n"
+"  archived until the balance is moved to the expense accounts.\n"
+"\n"
+"The provision accounts, the journal, the commission product and the standard scheme\n"
+"are created for each company on install.\n"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_salesperson__effective_percentage
+msgid "% of Sale"
+msgstr "% s/ venta"
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid "%(bill)s (%(vendor)s): %(state)s, %(payment)s"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid "%(provision)s: %(requested)s billed, %(available)s available"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid ""
+"%(reason)s\n"
+"Bills: %(bills)s.\n"
+"To unblock it: (1) if a bill is paid, even partially, unreconcile its payment; (2) reset the bill to draft and cancel it; (3) %(retry)s"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/project_project.py:0
+msgid ""
+"%s still has provision balances. Archive it from the project to move them to"
+" the expense accounts first."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/project_project.py:0
+msgid "%s still have provision balances: archive them one by one."
+msgstr ""
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.view_order_form
+msgid "<span class=\"o_stat_text\">Commission</span>"
+msgstr "<span class=\"o_stat_text\">Comisión</span>"
+
+#. module: sale_distribution
+#: model:ir.model.constraint,message:sale_distribution.constraint_sale_distribution_rule_role_unique
+msgid "A distribution scheme can have only one rule per role."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.constraint,message:sale_distribution.constraint_sale_distribution_accrual_partial_order_unique
+msgid "A payment is provisioned only once per sales order."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+#: code:addons/sale_distribution/models/account_move_line.py:0
+msgid ""
+"A posted provision entry cannot be changed. Corrections are made with "
+"separate entries."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid ""
+"A posted provision entry cannot be reset to draft. Corrections are made with"
+" separate entries."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_sale_distribution__is_used
+msgid "A sales order with this scheme already has provision entries."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_account_chart_template
+msgid "Account Chart Template"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_sale_distribution_rule__payable_account_id
+msgid ""
+"Account credited when a payment is provisioned, and debited by the vendor "
+"bills that pay this share. Without accounts, the share stays in income."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_sale_distribution_rule__expense_account_id
+msgid "Account debited when a payment is provisioned."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution__active
+msgid "Active"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid ""
+"Add an analytic account to the lines of %s against a provision account: the "
+"provision is checked by project."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_order.py:0
+msgid ""
+"Add at least one salesperson to the distribution of %s before confirming it."
+msgstr ""
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.view_order_form
+msgid "Analytic Report"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_order.py:0
+msgid "Analytic Report of %s"
+msgstr ""
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.sale_distribution_view_form
+#: model_terms:ir.ui.view,arch_db:sale_distribution.sale_distribution_view_search
+msgid "Archived"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__collected_untaxed_amount
+msgid "Base"
+msgstr ""
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.sale_distribution_accrual_view_form
+msgid "Beneficiary Breakdown"
+msgstr "Desglose por beneficiario"
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.sale_distribution_settlement_view_form
+msgid "Cancel"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__commission_amount
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_order__distribution_commission_amount
+msgid "Commission"
+msgstr "Comisión"
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_distribution_accrual.py:0
+msgid "Commission - %(payment)s - %(amount)s - %(invoice)s"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid "Commission Bills"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_res_company__distribution_commission_product_id
+#: model:ir.model.fields,field_description:sale_distribution.field_res_config_settings__distribution_commission_product_id
+msgid "Commission Product"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__purchase_line_ids
+msgid "Commission Purchase Lines"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_salesperson__percentage
+msgid "Commission Share (%)"
+msgstr "Parte de la comisión (%)"
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_sale_distribution_accrual__provisioned_amount
+msgid ""
+"Commission and implementation credited to the provision accounts by the "
+"provision entry."
+msgstr ""
+"Comisión e implementación abonadas a las cuentas de provisión por el asiento"
+" de provisión."
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_sale_order__distribution_commission_amount
+msgid "Commission provisioned by the payments of this order."
+msgstr "Comisión provisionada por los cobros de este pedido."
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_res_company
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution__company_id
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__company_id
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_rule__company_id
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_salesperson__company_id
+#: model:ir.model.fields.selection,name:sale_distribution.selection__sale_distribution_rule__role__company
+msgid "Company"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution__create_uid
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__create_uid
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_rule__create_uid
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_salesperson__create_uid
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_settlement__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution__create_date
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__create_date
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_rule__create_date
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_salesperson__create_date
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_settlement__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__currency_id
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_order__distribution_currency_id
+msgid "Currency"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_account_bank_statement_line__distribution_origin_move_id
+#: model:ir.model.fields,help:sale_distribution.field_account_move__distribution_origin_move_id
+msgid "Customer credit note whose excess this provision reversal comes from."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_purchase_order_line__distribution_accrual_id
+msgid ""
+"Customer payment whose salesperson provision this commission line pays."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__date
+msgid "Date"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution__is_default
+msgid "Default"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_account_chart_template__display_name
+#: model:ir.model.fields,field_description:sale_distribution.field_account_move__display_name
+#: model:ir.model.fields,field_description:sale_distribution.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:sale_distribution.field_account_partial_reconcile__display_name
+#: model:ir.model.fields,field_description:sale_distribution.field_product_template__display_name
+#: model:ir.model.fields,field_description:sale_distribution.field_project_project__display_name
+#: model:ir.model.fields,field_description:sale_distribution.field_purchase_order_line__display_name
+#: model:ir.model.fields,field_description:sale_distribution.field_res_company__display_name
+#: model:ir.model.fields,field_description:sale_distribution.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution__display_name
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__display_name
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_rule__display_name
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_salesperson__display_name
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_settlement__display_name
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_order__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_product_product__is_distributed
+#: model:ir.model.fields,field_description:sale_distribution.field_product_template__is_distributed
+msgid "Distributed"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_account_move_line__is_distributed
+msgid "Distributed Line"
+msgstr ""
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.res_config_settings_view_form
+msgid "Distribution"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_sale_distribution_accrual
+msgid "Distribution Accrual"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_account_bank_statement_line__distribution_accrual_count
+#: model:ir.model.fields,field_description:sale_distribution.field_account_move__distribution_accrual_count
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_order__distribution_accrual_count
+msgid "Distribution Accrual Count"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_account_partial_reconcile__distribution_accrual_ids
+msgid "Distribution Accruals"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_res_company__distribution_journal_id
+#: model:ir.model.fields,field_description:sale_distribution.field_res_config_settings__distribution_journal_id
+msgid "Distribution Journal"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_account_move_line__distribution_order_id
+msgid "Distribution Order"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_account_bank_statement_line__distribution_origin_move_id
+#: model:ir.model.fields,field_description:sale_distribution.field_account_move__distribution_origin_move_id
+msgid "Distribution Origin"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.actions.act_window,name:sale_distribution.sale_distribution_accrual_action
+#: model:ir.model.fields,field_description:sale_distribution.field_account_bank_statement_line__distribution_accrual_ids
+#: model:ir.model.fields,field_description:sale_distribution.field_account_move__distribution_accrual_ids
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_order__distribution_accrual_ids
+#: model:ir.ui.menu,name:sale_distribution.sale_distribution_accrual_menu
+msgid "Distribution Provisions"
+msgstr "Provisiones de reparto"
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_order__distribution_registered
+msgid "Distribution Registered"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_sale_distribution_rule
+#: model:ir.model.fields,field_description:sale_distribution.field_account_move_line__distribution_rule_id
+msgid "Distribution Rule"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_order__distribution_salesperson_ids
+msgid "Distribution Salespeople"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_sale_distribution_salesperson
+msgid "Distribution Salesperson"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_order__distribution_id
+msgid "Distribution Scheme"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.actions.act_window,name:sale_distribution.sale_distribution_action
+#: model:ir.ui.menu,name:sale_distribution.sale_distribution_menu_config
+#: model_terms:ir.ui.view,arch_db:sale_distribution.res_config_settings_view_form
+msgid "Distribution Schemes"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_order.py:0
+msgid ""
+"Distribution salespeople changed from %(before)s to %(after)s. The change "
+"applies to the payments reconciled from now on."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_rule__expense_account_id
+msgid "Expense Account"
+msgstr ""
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.res_config_settings_view_form
+msgid ""
+"How each payment is split between salespeople, implementers and the company"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_sale_order__distribution_id
+msgid ""
+"How the payments of this order are provisioned. Without a scheme, nothing is"
+" provisioned."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_account_chart_template__id
+#: model:ir.model.fields,field_description:sale_distribution.field_account_move__id
+#: model:ir.model.fields,field_description:sale_distribution.field_account_move_line__id
+#: model:ir.model.fields,field_description:sale_distribution.field_account_partial_reconcile__id
+#: model:ir.model.fields,field_description:sale_distribution.field_product_template__id
+#: model:ir.model.fields,field_description:sale_distribution.field_project_project__id
+#: model:ir.model.fields,field_description:sale_distribution.field_purchase_order_line__id
+#: model:ir.model.fields,field_description:sale_distribution.field_res_company__id
+#: model:ir.model.fields,field_description:sale_distribution.field_res_config_settings__id
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution__id
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__id
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_rule__id
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_salesperson__id
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_settlement__id
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_order__id
+msgid "ID"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__implementation_amount
+msgid "Implementation"
+msgstr "Implementación"
+
+#. module: sale_distribution
+#: model:ir.model.fields.selection,name:sale_distribution.selection__sale_distribution_rule__role__implementer
+msgid "Implementer"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__invoice_id
+msgid "Invoice"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution__is_used
+msgid "Is Used"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_account_move_line
+msgid "Journal Item"
+msgstr ""
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.res_config_settings_view_form
+msgid ""
+"Journal of the provision entries and product of the commission purchases"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_res_company__distribution_journal_id
+#: model:ir.model.fields,help:sale_distribution.field_res_config_settings__distribution_journal_id
+msgid "Journal of the provision entries."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution__write_uid
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__write_uid
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_rule__write_uid
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_salesperson__write_uid
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_settlement__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution__write_date
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__write_date
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_rule__write_date
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_salesperson__write_date
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_settlement__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_sale_distribution_settlement
+msgid "Move Provision Balances to Expenses"
+msgstr ""
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.sale_distribution_settlement_view_form
+msgid "Move to Expenses and Archive"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution__name
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__name
+msgid "Name"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/wizard/sale_distribution_settlement.py:0
+msgid ""
+"No provision entry explains the balance of %s: settle it with a manual "
+"entry."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_order.py:0
+msgid ""
+"Only sales administrators can change the salespeople of an order that "
+"already has provision entries."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid "Open the bills"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_salesperson__order_id
+msgid "Order"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_account_partial_reconcile
+msgid "Partial Reconcile"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__payment_move_id
+msgid "Payment"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_sale_distribution_salesperson__effective_percentage
+msgid ""
+"Percentage of each collected amount of the distributed lines that goes to "
+"this salesperson: their commission share times the salesperson percentage of"
+" the scheme."
+msgstr ""
+"Porcentaje de cada cobro de las líneas de reparto que corresponde a este "
+"vendedor: su parte de la comisión por el porcentaje comercial del esquema."
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_product_template
+msgid "Product"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_res_company__distribution_commission_product_id
+#: model:ir.model.fields,help:sale_distribution.field_res_config_settings__distribution_commission_product_id
+msgid ""
+"Product of the purchases that pay each salesperson. Its expense account must"
+" be the provision account of the salesperson rule."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_project_project
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_settlement__project_id
+msgid "Project"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_rule__payable_account_id
+msgid "Provision Account"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/project_project.py:0
+msgid "Provision Balances"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__provision_move_id
+msgid "Provision Entry"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/wizard/sale_distribution_settlement.py:0
+msgid "Provision balance of %s moved to expenses"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.module.module,summary:base.module_sale_distribution
+msgid ""
+"Provision each customer payment between salespeople, implementers and the "
+"company"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_distribution_accrual.py:0
+msgid "Provision of %(payment)s for %(invoice)s"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid "Provision reversed by %s"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__provisioned_amount
+#: model_terms:ir.ui.view,arch_db:sale_distribution.view_move_form
+msgid "Provisioned"
+msgstr "Provisionado"
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_purchase_order_line__distribution_accrual_id
+msgid "Provisioned Payment"
+msgstr ""
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.res_config_settings_view_form
+msgid "Provisions"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_purchase_order_line
+msgid "Purchase Order Line"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__partial_reconcile_id
+msgid "Reconciliation"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid ""
+"Retry the correction: unreconcile the customer payment or post the credit "
+"note again."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid "Reversal of: %s"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_rule__role
+msgid "Role"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution__rule_ids
+msgid "Rules"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.module.module,shortdesc:base.module_sale_distribution
+msgid "Sale Distribution"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model,name:sale_distribution.model_sale_order
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__order_id
+#: model_terms:ir.ui.view,arch_db:sale_distribution.sale_distribution_accrual_view_search
+msgid "Sales Order"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_salesperson__user_id
+#: model:ir.model.fields.selection,name:sale_distribution.selection__sale_distribution_rule__role__salesperson
+msgid "Salesperson"
+msgstr "Vendedor"
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.view_order_form
+msgid "Salesperson Distribution"
+msgstr "Distribución entre vendedores"
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_accrual__distribution_id
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_rule__distribution_id
+msgid "Scheme"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_sale_distribution__is_default
+msgid "Scheme given to the new sales orders of the company."
+msgstr ""
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.res_config_settings_view_form
+msgid "Schemes"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_rule__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/res_company.py:0
+msgid ""
+"Set the distribution journal and commission product of %s in the Sales "
+"settings."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_rule__percentage
+msgid "Share (%)"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_sale_distribution_salesperson__percentage
+msgid ""
+"Share of the scheme's salesperson commission assigned to this salesperson. "
+"The shares of an order must add up to 100%."
+msgstr ""
+"Parte de la comisión comercial del esquema asignada a este vendedor. Las "
+"partes de un pedido deben sumar 100%."
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution_settlement__summary
+msgid "Summary"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_distribution_rule.py:0
+msgid ""
+"The %s rule needs both an expense account and a provision account, or none."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_product_product__is_distributed
+#: model:ir.model.fields,help:sale_distribution.field_product_template__is_distributed
+msgid ""
+"The collected amount of this product is provisioned according to the "
+"distribution scheme of the sales order."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_distribution_rule.py:0
+msgid "The company share stays in income: its rule takes no accounts."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_order.py:0
+msgid ""
+"The distribution scheme of an order cannot be changed once the order has "
+"provision entries."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_sale_order__distribution_registered
+msgid "The order already has provision entries."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid ""
+"The provision %(provision)s is negative: %(balance)s. The next payments "
+"replenish it, and vendor bills against it are rejected until it is positive."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_distribution_rule.py:0
+msgid ""
+"The provision account of the salesperson rule must be the expense account of"
+" the commission product %(product)s (%(account)s), so that its vendor bills "
+"consume it."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_distribution.py:0
+msgid "The rules of the distribution scheme %s must add up to 100%%."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_order.py:0
+msgid "The salespeople of %s must add up to 100%% of the salesperson share."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.constraint,message:sale_distribution.constraint_sale_distribution_rule_percentage_range
+msgid "The share of a rule must be between 0% and 100%."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.constraint,message:sale_distribution.constraint_sale_distribution_salesperson_percentage_range
+msgid "The share of a salesperson must be greater than 0% and at most 100%."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid "The vendor bill exceeds the provision available: %s"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid ""
+"This correction would leave a negative commission provision: its commissions"
+" are already billed."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_distribution_accrual.py:0
+msgid ""
+"This customer payment cannot be unreconciled: its commissions are already "
+"billed."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_distribution_rule.py:0
+msgid ""
+"This distribution scheme already has provision entries: its rules cannot be "
+"changed. Archive it and create a new scheme instead."
+msgstr ""
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.sale_distribution_settlement_view_form
+msgid ""
+"This project still has provision balances. Move them to the expense accounts of\n"
+"                    their rules to archive it."
+msgstr ""
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.sale_distribution_view_form
+msgid ""
+"This scheme already has provision entries: its rules cannot be changed.\n"
+"                        Archive it and create a new scheme instead."
+msgstr ""
+
+#. module: sale_distribution
+#: model_terms:ir.ui.view,arch_db:sale_distribution.sale_distribution_accrual_view_form
+#: model_terms:ir.ui.view,arch_db:sale_distribution.sale_distribution_accrual_view_list
+msgid "Total"
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,field_description:sale_distribution.field_sale_distribution__total_percentage
+msgid "Total (%)"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/sale_distribution_accrual.py:0
+msgid ""
+"Unreconcile the customer payment again: its provision is reversed and its "
+"commission purchases are cancelled."
+msgstr ""
+
+#. module: sale_distribution
+#: model:ir.model.fields,help:sale_distribution.field_account_move_line__is_distributed
+msgid ""
+"Whether the product of this invoice line was a distributed product when the "
+"invoice was posted."
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid "not paid"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid "paid"
+msgstr ""
+
+#. module: sale_distribution
+#. odoo-python
+#: code:addons/sale_distribution/models/account_move.py:0
+msgid "partially paid"
+msgstr ""

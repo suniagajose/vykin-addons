@@ -12,6 +12,9 @@
                 <field name="payment_move_id"/>
                 <field name="distribution_id"/>
                 <field name="collected_untaxed_amount" sum="Total"/>
+                <field name="commission_amount" sum="Total"/>
+                <field name="implementation_amount" sum="Total"/>
+                <field name="provisioned_amount" sum="Total"/>
                 <field name="provision_move_id"/>
                 <field name="company_id" groups="base.group_multi_company"/>
                 <field name="currency_id" column_invisible="1"/>
@@ -33,7 +36,6 @@
                             <field name="order_id"/>
                             <field name="invoice_id"/>
                             <field name="payment_move_id"/>
-                            <field name="partial_reconcile_id"/>
                         </group>
                         <group>
                             <field name="date"/>
@@ -44,12 +46,12 @@
                             <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
+                    <separator string="Beneficiary Breakdown"/>
                     <field name="purchase_line_ids">
                         <list>
                             <field name="order_id"/>
                             <field name="partner_id"/>
-                            <field name="name"/>
-                            <field name="price_subtotal"/>
+                            <field name="price_subtotal" sum="Total"/>
                             <field name="state"/>
                         </list>
                     </field>
@@ -72,7 +74,7 @@
     </record>
 
     <record id="sale_distribution_accrual_action" model="ir.actions.act_window">
-        <field name="name">Provisioned Payments</field>
+        <field name="name">Distribution Provisions</field>
         <field name="res_model">sale.distribution.accrual</field>
         <field name="view_mode">list,form</field>
     </record>

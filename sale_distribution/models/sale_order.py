@@ -48,9 +48,14 @@ class SaleOrder(models.Model):
         help="The order already has provision entries.",
     )
     distribution_accrual_ids = fields.One2many(
-        'sale.distribution.accrual', 'order_id', string="Provisioned Payments", readonly=True,
+        'sale.distribution.accrual', 'order_id', string="Distribution Provisions", readonly=True,
     )
     distribution_accrual_count = fields.Integer(compute='_compute_distribution_accrual_count')
+    distribution_currency_id = fields.Many2one(related='company_id.currency_id')
+    distribution_commission_amount = fields.Monetary(
+        string="Commission", compute='_compute_distribution_accrual_count', currency_field='distribution_currency_id',
+        help="Commission provisioned by the payments of this order.",
+    )
 
     @api.depends('company_id')
     def _compute_distribution_id(self):
@@ -85,11 +90,14 @@ class SaleOrder(models.Model):
             order.distribution_registered = order in registered
 
     def _compute_distribution_accrual_count(self):
-        counts = dict(self.env['sale.distribution.accrual']._read_group(
-            [('order_id', 'in', self.ids)], ['order_id'], ['__count'],
-        ))
+        totals = {
+            order: (count, commission)
+            for order, count, commission in self.env['sale.distribution.accrual']._read_group(
+                [('order_id', 'in', self.ids)], ['order_id'], ['__count', 'commission_amount:sum'],
+            )
+        }
         for order in self:
-            order.distribution_accrual_count = counts.get(order, 0)
+            order.distribution_accrual_count, order.distribution_commission_amount = totals.get(order, (0, 0.0))
 
     @api.constrains('distribution_salesperson_ids')
     def _check_distribution_salesperson_ids(self):

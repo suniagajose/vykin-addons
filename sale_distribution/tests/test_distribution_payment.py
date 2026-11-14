@@ -35,6 +35,19 @@ class TestDistributionPayment(DistributionCommon):
         self._pay(invoice, 1000.0)
         self.assertEqual(self._bases(order), [500.0, 500.0])
 
+    def test_provisioned_amounts(self):
+        order = self._create_order()
+        invoice = self._invoice(order)
+        self._pay(invoice, 1000.0)
+        accrual = order.distribution_accrual_ids
+        self.assertRecordValues(accrual, [{
+            'commission_amount': 100.0, 'implementation_amount': 375.0, 'provisioned_amount': 475.0,
+        }])
+        self.assertEqual(order.distribution_commission_amount, 100.0)
+        self._pay(invoice, 1000.0)
+        order.invalidate_recordset(['distribution_commission_amount'])
+        self.assertEqual(order.distribution_commission_amount, 200.0)
+
     def test_base_of_partial_payment(self):
         # CA-21
         order = self._create_order()
