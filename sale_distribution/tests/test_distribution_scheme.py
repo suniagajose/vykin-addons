@@ -124,6 +124,10 @@ class TestDistributionScheme(DistributionCommon):
                                               Command.create({'user_id': self.user_v2.id, 'percentage': 40.0})]
         self.assertEqual(order.distribution_salesperson_ids.mapped('percentage'), [60.0, 40.0])
 
+    def test_salespeople_percentage_of_sale(self):
+        order = self._create_order()
+        self.assertEqual(order.distribution_salesperson_ids.mapped('effective_percentage'), [12.0, 8.0])
+
     # R3.1.1
     def test_salespeople_total(self):
         # CA-31, CA-32

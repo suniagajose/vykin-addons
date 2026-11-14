@@ -24,6 +24,12 @@ class SaleDistributionAccrual(models.Model):
     currency_id = fields.Many2one(related='company_id.currency_id')
     date = fields.Date(required=True, readonly=True)
     collected_untaxed_amount = fields.Monetary(string="Base", readonly=True)
+    commission_amount = fields.Monetary(string="Commission", compute='_compute_provisioned_amounts', store=True)
+    implementation_amount = fields.Monetary(string="Implementation", compute='_compute_provisioned_amounts', store=True)
+    provisioned_amount = fields.Monetary(
+        string="Provisioned", compute='_compute_provisioned_amounts', store=True,
+        help="Commission and implementation credited to the provision accounts by the provision entry.",
+    )
     provision_move_id = fields.Many2one('account.move', string="Provision Entry", readonly=True, index='btree_not_null')
     purchase_line_ids = fields.One2many(
         'purchase.order.line', 'distribution_accrual_id', string="Commission Purchase Lines", readonly=True,
@@ -40,6 +46,24 @@ class SaleDistributionAccrual(models.Model):
             accrual.name = " - ".join(filter(None, (
                 accrual.invoice_id.name, accrual.order_id.name, accrual.payment_move_id.name,
             )))
+
+    @api.depends(
+        'provision_move_id.line_ids.balance',
+        'provision_move_id.line_ids.account_id',
+        'provision_move_id.line_ids.distribution_rule_id.role',
+        'provision_move_id.line_ids.distribution_rule_id.payable_account_id',
+    )
+    def _compute_provisioned_amounts(self):
+        for accrual in self:
+            # sudo: the amounts are read from the provision entry, whoever triggers the compute.
+            lines = accrual.provision_move_id.sudo().line_ids.filtered(
+                lambda aml: aml.account_id == aml.distribution_rule_id.payable_account_id,
+            )
+            amounts = {role: -sum(lines.filtered(lambda aml: aml.distribution_rule_id.role == role).mapped('balance'))
+                       for role in ('salesperson', 'implementer')}
+            accrual.commission_amount = amounts['salesperson']
+            accrual.implementation_amount = amounts['implementer']
+            accrual.provisioned_amount = amounts['salesperson'] + amounts['implementer']
 
     def _get_payment_amount(self):
         """ Amount of the payment or bank transaction, in its currency, for the commission. """

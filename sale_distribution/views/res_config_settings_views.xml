@@ -24,7 +24,7 @@
                     <setting id="distribution_schemes" string="Distribution Schemes"
                         help="How each payment is split between salespeople, implementers and the company">
                         <button name="%(sale_distribution.sale_distribution_action)d" type="action"
-                            string="Schemes" class="btn-link" icon="oi-arrow-right"/>
+                            string="Schemes" class="btn-link" icon="east"/>
                     </setting>
                 </block>
             </block>

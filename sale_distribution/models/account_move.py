@@ -14,7 +14,7 @@ class AccountMove(models.Model):
         help="Customer credit note whose excess this provision reversal comes from.",
     )
     distribution_accrual_ids = fields.One2many(
-        'sale.distribution.accrual', 'invoice_id', string="Provisioned Payments", readonly=True,
+        'sale.distribution.accrual', 'invoice_id', string="Distribution Provisions", readonly=True,
     )
     distribution_accrual_count = fields.Integer(compute='_compute_distribution_accrual_count')
 

@@ -7,16 +7,23 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <div name="button_box" position="inside">
-                <button name="action_view_distribution_accruals" type="object" class="oe_stat_button" icon="fa-pie-chart"
+                <button name="action_view_distribution_accruals" type="object" class="oe_stat_button" icon="pie_chart"
                     invisible="not distribution_accrual_count">
-                    <field name="distribution_accrual_count" widget="statinfo" string="Provisioned"/>
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="distribution_currency_id" invisible="1"/>
+                            <field name="distribution_commission_amount" widget="monetary"
+                                options="{'currency_field': 'distribution_currency_id'}"/>
+                        </span>
+                        <span class="o_stat_text">Commission</span>
+                    </div>
                 </button>
-                <button name="action_view_distribution_analytic" type="object" class="oe_stat_button" icon="fa-bar-chart"
+                <button name="action_view_distribution_analytic" type="object" class="oe_stat_button" icon="bar_chart"
                     string="Analytic Report" invisible="not project_account_id"
                     groups="analytic.group_analytic_accounting"/>
             </div>
             <group name="sales_person" position="after">
-                <group name="distribution" string="Distribution">
+                <group name="distribution" string="Salesperson Distribution">
                     <field name="distribution_registered" invisible="1"/>
                     <field name="project_account_id" invisible="1"/>
                     <field name="distribution_id" readonly="distribution_registered"/>
@@ -24,6 +31,7 @@
                         <list editable="bottom">
                             <field name="user_id" widget="many2one_avatar_user"/>
                             <field name="percentage"/>
+                            <field name="effective_percentage"/>
                         </list>
                     </field>
                 </group>
