@@ -129,13 +129,10 @@ class ProvisionCommon(AccountTestInvoicingCommon):
     def _pay(self, move, amount, date, currency=None):
         """ Register a payment of ``amount`` (all that is due, if empty) of a customer invoice or credit note,
         which reconciles it. """
-        wizard = self.env['account.payment.register'].with_context(
-            active_model='account.move', active_ids=move.ids,
-        ).create({
-            'payment_date': date, **({'amount': amount} if amount else {}),
+        return self._register_payment(
+            move, payment_date=date, **({'amount': amount} if amount else {}),
             **({'currency_id': currency.id} if currency else {}),
-        })
-        return wizard._create_payments()
+        )
 
     def _provision_entries(self):
         return self.env['account.move'].search([('provision_origin_move_id', '!=', False)], order='id')
@@ -191,16 +188,30 @@ class ProvisionCase(ProvisionCommon):
         self._pay(self.f1, 7540.0, '2026-11-10')
 
     def _credit_note(self, lines, date='2026-11-12', origin=None, taxed=True):
-        credit_note = self._invoice(
+        return self._invoice(
             lines, move_type='out_refund', salesperson=self.ana, date=date, post=True, taxed=taxed,
             reversed_entry_id=origin.id if origin else False,
         )
-        return credit_note
+
+    def _bill(self, partner, lines, move_type='in_invoice', post=False):
+        """ A vendor bill with lines (account, price) in AA-X or (account, price, analytic distribution). """
+        bill = self.env['account.move'].create({
+            'move_type': move_type,
+            'partner_id': partner.id,
+            'invoice_date': '2026-11-12',
+            'invoice_line_ids': [Command.create({
+                'name': "Line", 'account_id': account.id, 'quantity': 1, 'price_unit': price,
+                'tax_ids': [Command.clear()],
+                'analytic_distribution': (analytic[0] if analytic else {self.analytic_x.id: 100}) or False,
+            }) for account, price, *analytic in lines],
+        })
+        if post:
+            bill.action_post()
+        return bill
 
     @staticmethod
     def _receivable(move):
         return move.line_ids.filtered(lambda line: line.account_id.account_type == 'asset_receivable')
-
 
     def _nc2(self):
         return self._credit_note([{**self.line_x, 'price': 1000.0}], date='2026-11-14')

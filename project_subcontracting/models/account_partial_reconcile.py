@@ -21,7 +21,7 @@ class AccountPartialReconcile(models.Model):
         """ Provision what this reconciliation brings in for each customer invoice or credit note it
         reconciles, and create the commission bill of each salesperson (R3, R4). """
         self.ensure_one()
-        commission_net = defaultdict(float)
+        commission_net = defaultdict(lambda: defaultdict(float))  # {salesperson: {analytic account id: net}}
         documents = self.env['account.move']
         entries = self.env['account.move']
         for line, counterpart in ((self.debit_move_id, self.credit_move_id), (self.credit_move_id, self.debit_move_id)):
@@ -33,6 +33,7 @@ class AccountPartialReconcile(models.Model):
                 entries |= entry
         if documents:
             self._check_commission_balances(entries)
+        if commission_net:
             self._create_commission_bills(documents, commission_net)
 
     def unlink(self):
@@ -41,12 +42,9 @@ class AccountPartialReconcile(models.Model):
         if not self:
             return super().unlink()
         # sudo: the entries and bills are system data, handled for whoever unreconciles.
-        entries = self.env['account.move'].sudo().search([
-            ('provision_partial_id', 'in', self.ids), ('move_type', '=', 'entry'), ('state', '=', 'posted'),
-        ])
-        if bills := self.env['account.move'].sudo().search([
-            ('provision_partial_id', 'in', self.ids), ('move_type', '=', 'in_invoice'), ('state', '=', 'draft'),
-        ]):
+        moves = self.env['account.move'].sudo().search([('provision_partial_id', 'in', self.ids)])
+        entries = moves.filtered(lambda move: move.move_type == 'entry' and move.state == 'posted')
+        if bills := moves.filtered(lambda move: move.move_type == 'in_invoice' and move.state == 'draft'):
             bills.button_cancel()
         if entries:
             reversals = entries._reverse_moves(default_values_list=[{
@@ -143,8 +141,10 @@ class AccountPartialReconcile(models.Model):
         provisioned_lines = document.invoice_line_ids.filtered(
             lambda aml: aml.provision_commission_percent or aml.provision_implementation_percent,
         )
+        if not provisioned_lines:
+            return self.env['account.move']
         portion, is_last = self._get_provision_portion(document, line)
-        if not provisioned_lines or not portion:
+        if not portion:
             return self.env['account.move']
         company = self.company_id
         currency = company.currency_id
@@ -188,7 +188,7 @@ class AccountPartialReconcile(models.Model):
                 ]
                 if role == 'commission':
                     for analytic_id, share in provisioned_line._get_provision_analytic_shares():
-                        commission_net[document.invoice_user_id, analytic_id] += amount * share / 100.0
+                        commission_net[document.invoice_user_id][analytic_id] += amount * share / 100.0
         if not line_vals_list:
             return self.env['account.move']
         entry = self.env['account.move'].sudo().with_company(company).create({
@@ -234,10 +234,7 @@ class AccountPartialReconcile(models.Model):
             amount=format_amount(self.env, amount, invoice.currency_id),
             invoice=invoice.name,
         )
-        net_by_user = defaultdict(dict)
-        for (user, analytic_id), net in commission_net.items():
-            net_by_user[user][analytic_id] = net
-        for user, nets in net_by_user.items():
+        for user, nets in commission_net.items():
             lines = [
                 Command.create({
                     'product_id': product.id,

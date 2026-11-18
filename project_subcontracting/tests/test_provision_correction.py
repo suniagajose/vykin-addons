@@ -13,26 +13,9 @@ class TestProvisionCorrection(ProvisionCase):
     def _unreconcile(self, move):
         self._receivable(move).remove_move_reconcile()
 
-    def _bill(self, partner, lines, post=False):
-        bill = self.env['account.move'].create({
-            'move_type': 'in_invoice', 'partner_id': partner.id, 'invoice_date': '2026-11-12',
-            'invoice_line_ids': [Command.create({
-                'name': "Line", 'account_id': account.id, 'quantity': 1, 'price_unit': price,
-                'tax_ids': [Command.clear()], 'analytic_distribution': {self.analytic_x.id: 100},
-            }) for account, price in lines],
-        })
-        if post:
-            bill.action_post()
-        return bill
-
     def _post_commission_bill(self, bill):
         bill.invoice_date = '2026-11-12'
         bill.action_post()
-
-    def _pay_bill(self, bill):
-        self.env['account.payment.register'].with_context(active_model='account.move', active_ids=bill.ids).create(
-            {'payment_date': '2026-11-13'},
-        )._create_payments()
 
     def test_63_unreconcile_reverses_and_cancels(self):
         self._e1()
@@ -74,7 +57,7 @@ class TestProvisionCorrection(ProvisionCase):
     def _paid_commission_bill(self):
         bill = self._commission_bills()
         self._post_commission_bill(bill)
-        self._pay_bill(bill)
+        self._register_payment(bill, payment_date='2026-11-13')
         return bill
 
     def test_66_commission_already_billed_blocks_unreconciling(self):
