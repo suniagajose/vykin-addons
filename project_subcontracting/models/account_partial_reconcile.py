@@ -85,7 +85,7 @@ class AccountPartialReconcile(models.Model):
 
     def _get_provision_date(self, journal):
         """ The most recent date of the two documents or, if it is locked, the first open one (R3.4). """
-        lock_date = self.company_id._get_user_fiscal_lock_date(journal)
+        lock_date = journal.company_id._get_user_fiscal_lock_date(journal)
         return max(self.max_date, lock_date + timedelta(days=1))
 
     def _create_provision_entry(self, document, line, counterpart_move, commission_net):
@@ -103,7 +103,9 @@ class AccountPartialReconcile(models.Model):
         portion, is_last = self._get_provision_portion(document, line)
         if not portion:
             return self.env['account.move']
-        company = self.company_id
+        # The company of the document, which the reconciliation may not share (a credit note of one company
+        # paid with a payment of another): its percentages, journal and accounts are the ones that count.
+        company = document.company_id
         currency = company.currency_id
         journal = company.provision_journal_id
         if not (journal and company.provision_commission_expense_account_id and company.provision_implementation_expense_account_id):
@@ -173,7 +175,7 @@ class AccountPartialReconcile(models.Model):
     def _post_unprovisioned_commission_note(self, document, counterpart_move, unprovisioned):
         """ Say on the document that the commission of this reconciliation stays in income because the
         document has no salesperson (R3.6). """
-        currency = self.company_id.currency_id
+        currency = document.company_id.currency_id
         amount = self.debit_amount_currency if self.debit_move_id.move_id == document else self.credit_amount_currency
         # sudo: the system writes the note, whoever reconciles.
         document.sudo().message_post(
@@ -194,10 +196,10 @@ class AccountPartialReconcile(models.Model):
         reconciliation is positive in some analytic account, with a line per provision account and
         analytic account, against that provision account (R4.1). """
         self.ensure_one()
-        company = self.company_id
+        invoice = documents.filtered(lambda move: move.move_type == 'out_invoice')[:1] or documents[:1]
+        company = invoice.company_id
         currency = company.currency_id
         product = self.env.ref('project_subcontracting.product_commission')
-        invoice = documents.filtered(lambda move: move.move_type == 'out_invoice')[:1] or documents[:1]
         counterpart = ((self.debit_move_id | self.credit_move_id).move_id - invoice)[:1]
         amount = self.debit_amount_currency if self.debit_move_id.move_id == invoice else self.credit_amount_currency
         description = self.env._(
