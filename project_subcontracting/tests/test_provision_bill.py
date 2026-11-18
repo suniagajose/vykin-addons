@@ -1,4 +1,3 @@
-from odoo import Command
 from odoo.exceptions import UserError
 from odoo.tests import tagged
 
@@ -10,21 +9,6 @@ class TestProvisionBill(ProvisionCase):
     """ Acceptance cases CA-55 to CA-62 of the spec (R6), from state E1: F1 posted and half paid, which
     provisions 3,750.00 of implementation in AA-X and 1,000.00 and 200.00 of commission of Comisionistas SA
     in AA-X and AA-Y. """
-
-    def _bill(self, partner, lines, move_type='in_invoice', post=False):
-        """ A vendor bill with lines (account, price, analytic distribution). """
-        bill = self.env['account.move'].create({
-            'move_type': move_type,
-            'partner_id': partner.id,
-            'invoice_date': '2026-11-12',
-            'invoice_line_ids': [Command.create({
-                'name': "Line", 'account_id': account.id, 'quantity': 1, 'price_unit': price,
-                'tax_ids': [Command.clear()], 'analytic_distribution': analytic or False,
-            }) for account, price, analytic in lines],
-        })
-        if post:
-            bill.action_post()
-        return bill
 
     def _x(self, percent=100):
         return {self.analytic_x.id: percent}

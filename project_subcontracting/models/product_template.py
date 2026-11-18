@@ -65,7 +65,7 @@ class ProductTemplate(models.Model):
         """ A product with a provision account generates its project from a template with
         Subcontracting (R1.5). Not a constraint: the company dependent fields it reads are not set yet
         when the ORM checks the constraints of a creation. """
-        if wrong := self.filtered(lambda product: product._has_provision_account() and not product._has_provision_project()):
+        if wrong := self.filtered(lambda product: not product._has_provision_project() and product._has_provision_account()):
             raise ValidationError(self.env._(
                 "A product with a provision account must generate a project from a project template with "
                 "Subcontracting. Fix: %s", wrong.mapped('display_name'),

@@ -42,7 +42,7 @@ class ProjectProject(models.Model):
             # sudo: whoever changes a template must hear about the products that depend on it.
             products = self.env['product.template'].sudo().search([('project_template_id', 'in', templates.ids)])
             if wrong := products.filtered(
-                lambda product: product._has_provision_account() and (deleting or not product._has_provision_project()),
+                lambda product: (deleting or not product._has_provision_project()) and product._has_provision_account(),
             ):
                 raise ValidationError(self.env._(
                     "These products have a provision account and need their project template to stay active "

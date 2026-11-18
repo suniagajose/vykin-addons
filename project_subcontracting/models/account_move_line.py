@@ -41,7 +41,6 @@ class AccountMoveLine(models.Model):
             'implementation': ('provision_implementation_percent', 'provision_implementation_account_id'),
         }
         values = dict.fromkeys((fname for names in fields_by_role.values() for fname in names), False)
-        values.update(provision_commission_percent=0.0, provision_implementation_percent=0.0)
         if not self.product_id:
             return values
         move = self.move_id
@@ -53,8 +52,7 @@ class AccountMoveLine(models.Model):
                 ),
             )[:1]
             if credited:
-                return {fname: credited[fname].id if credited._fields[fname].type == 'many2one' else credited[fname]
-                        for fname in values}
+                return credited._convert_to_write({fname: credited[fname] for fname in values})
         company = move.company_id
         product = self.product_id.product_tmpl_id.with_company(company)
         for role, (percent_field, account_field) in fields_by_role.items():
