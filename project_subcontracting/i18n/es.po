@@ -855,3 +855,22 @@ msgstr "su tarea no tiene costo de subcontratación por hora"
 #: code:addons/project_subcontracting/models/account_analytic_line.py:0
 msgid "its task is not done"
 msgstr "su tarea no está terminada"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_move_line.py:0
+msgid ""
+"The analytic distribution of a posted provision entry cannot be changed."
+msgstr ""
+"La distribución analítica de un asiento de provisión publicado no se puede "
+"cambiar."
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/res_company.py:0
+msgid ""
+"The provision journal %s must be secured with a hash, so that its entries "
+"cannot be changed."
+msgstr ""
+"El diario de provisión %s debe estar asegurado con hash, para que sus "
+"asientos no se puedan cambiar."

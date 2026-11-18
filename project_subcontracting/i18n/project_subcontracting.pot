@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 20:03+0000\n"
-"PO-Revision-Date: 2026-11-18 20:03+0000\n"
+"POT-Creation-Date: 2026-11-18 23:52+0000\n"
+"PO-Revision-Date: 2026-11-18 23:52+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -519,6 +519,13 @@ msgstr ""
 
 #. module: project_subcontracting
 #. odoo-python
+#: code:addons/project_subcontracting/models/account_move_line.py:0
+msgid ""
+"The analytic distribution of a posted provision entry cannot be changed."
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
 #: code:addons/project_subcontracting/models/res_company.py:0
 msgid ""
 "The commission and implementation percentages of %s cannot be negative and "
@@ -556,6 +563,14 @@ msgstr ""
 msgid ""
 "The provision does not cover this bill:\n"
 "%s"
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/res_company.py:0
+msgid ""
+"The provision journal %s must be secured with a hash, so that its entries "
+"cannot be changed."
 msgstr ""
 
 #. module: project_subcontracting
