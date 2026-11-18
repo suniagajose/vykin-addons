@@ -71,7 +71,7 @@ class AccountPartialReconcile(models.Model):
             return
         currency = (self.company_id[:1] or self.env.company).currency_id
         balances = self.env['account.move.line']._get_provision_balances(
-            self.env['account.account'].union(*(account for account, _analytic, _partner in keys)),
+            self.env['account.account'].union([account for account, _analytic, _partner in keys]),
             {analytic_id for _account, analytic_id, _partner in keys},
         )
         if negatives := [key for key in keys if currency.compare_amounts(balances[key], 0.0) < 0]:
