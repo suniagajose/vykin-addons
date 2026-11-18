@@ -42,9 +42,15 @@ class ResCompany(models.Model):
     )
     def _check_provision_company(self):
         """ The journal and the expense accounts of the provision belong to the company or to one of its
-        parents, as Odoo lets branches use the accounts of their parent company. """
+        parents, as Odoo lets branches use the accounts of their parent company, and the journal is secured
+        with a hash, which is what keeps the provision entries from being changed (R7.4). """
         for company in self:
             journal = company.provision_journal_id
+            if journal and not journal.restrict_mode_hash_table:
+                raise ValidationError(self.env._(
+                    "The provision journal %s must be secured with a hash, so that its entries cannot be changed.",
+                    journal.display_name,
+                ))
             accounts = company.provision_commission_expense_account_id | company.provision_implementation_expense_account_id
             if (journal and journal.company_id not in company.parent_ids) or accounts.filtered(
                 lambda account: not account.company_ids & company.parent_ids,

@@ -145,6 +145,13 @@ class TestProvisionConfig(ProvisionCommon):
         with self.assertRaises(ValidationError):
             self.company_b.provision_commission_expense_account_id = self.company_a.provision_commission_expense_account_id
 
+    def test_provision_journal_needs_a_hash(self):
+        journal = self.env['account.journal'].create({
+            'name': "Plain", 'code': 'PLN', 'type': 'general', 'company_id': self.company_a.id,
+        })
+        with self.assertRaises(ValidationError):
+            self.company_a.provision_journal_id = journal
+
     # R1.5: a product with a provision generates its project from a template with Subcontracting
 
     def test_79_tracking_is_kept_by_a_product_with_provision(self):
