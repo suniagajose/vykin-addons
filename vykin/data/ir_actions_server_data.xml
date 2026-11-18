@@ -8,7 +8,7 @@
         <field name="use_in_ai" eval="True"/>
         <field name="use_in_mcp" eval="True"/>
         <field name="is_readonly" eval="False"/>
-        <field name="ai_tool_description">Crea una tarea en un proyecto de Odoo. Requiere el título y el ID del proyecto (buscarlo con ai_tool_search sobre project.project); la descripción y la tarea padre son opcionales. Pide confirmación al usuario antes de llamarla.</field>
+        <field name="ai_tool_description">Crea una tarea en un proyecto de Odoo. Requiere el título y el ID del proyecto (buscarlo con ai_tool_search sobre project.project); la descripción, la tarea padre, la secuencia, las etiquetas y la etapa son opcionales. Pide confirmación al usuario antes de llamarla.</field>
         <field name="ai_tool_schema"><![CDATA[{
     "type": "object",
     "properties": {
@@ -29,6 +29,22 @@
         "parent_id": {
             "type": "integer",
             "description": "ID de la tarea padre (opcional; buscarla con ai_tool_search sobre project.task)"
+        },
+        "sequence": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Secuencia de la tarea (opcional; menor va primero)"
+        },
+        "tag_ids": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            },
+            "description": "IDs de project.tags (opcional; buscarlos con ai_tool_search sobre project.tags)"
+        },
+        "stage_id": {
+            "type": "integer",
+            "description": "ID de la etapa (opcional; debe ser una etapa del proyecto, buscarla con ai_tool_search sobre project.task.type). Cambiar la etapa puede activar los automatismos del proyecto."
         }
     },
     "required": [
@@ -47,6 +63,17 @@ if parent_id:
     if not parent:
         raise UserError("No existe una tarea de proyecto con id %s para usar como padre." % parent_id)
     vals['parent_id'] = parent.id
+if sequence is not None:
+    vals['sequence'] = sequence
+if tag_ids is not None:
+    tags = env['project.tags'].search([('id', 'in', tag_ids)])
+    if len(tags) != len(set(tag_ids)):
+        raise UserError("Alguna de las etiquetas indicadas no existe.")
+    vals['tag_ids'] = [(6, 0, tags.ids)]
+if stage_id is not None:
+    if stage_id not in env['project.project'].browse(project_id).type_ids.ids:
+        raise UserError("La etapa %s no es una etapa del proyecto %s." % (stage_id, project_id))
+    vals['stage_id'] = stage_id
 task = env['project.task'].create(vals)
 ai['result'] = {'id': task.id, 'name': task.name, 'parent_id': task.parent_id.id or False}]]></field>
     </record>
@@ -59,7 +86,7 @@ ai['result'] = {'id': task.id, 'name': task.name, 'parent_id': task.parent_id.id
         <field name="use_in_ai" eval="True"/>
         <field name="use_in_mcp" eval="True"/>
         <field name="is_readonly" eval="False"/>
-        <field name="ai_tool_description">Actualiza una tarea existente de un proyecto de Odoo. Requiere task_id y al menos un campo a cambiar (título, descripción, prioridad, estado, fecha límite, asignados o tarea padre); los campos omitidos no se modifican. Pide confirmación al usuario antes de llamarla.</field>
+        <field name="ai_tool_description">Actualiza una tarea existente de un proyecto de Odoo. Requiere task_id y al menos un campo a cambiar (título, descripción, prioridad, estado, fecha límite, asignados, tarea padre, secuencia, etiquetas o etapa); los campos omitidos no se modifican. Pide confirmación al usuario antes de llamarla.</field>
         <field name="ai_tool_schema"><![CDATA[{
     "type": "object",
     "properties": {
@@ -114,6 +141,22 @@ ai['result'] = {'id': task.id, 'name': task.name, 'parent_id': task.parent_id.id
         "parent_id": {
             "type": "integer",
             "description": "ID de la tarea padre (buscarla con ai_tool_search sobre project.task). 0 quita la tarea padre. Omitir para no cambiarla."
+        },
+        "sequence": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Nueva secuencia de la tarea (menor va primero; omitir para no cambiarla)"
+        },
+        "tag_ids": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            },
+            "description": "IDs de project.tags de la tarea; reemplaza a las actuales (buscarlos con ai_tool_search sobre project.tags)"
+        },
+        "stage_id": {
+            "type": "integer",
+            "description": "ID de la nueva etapa; debe ser una etapa del proyecto de la tarea (buscarla con ai_tool_search sobre project.task.type). Cambiar la etapa puede activar los automatismos del proyecto. Omitir para no cambiarla."
         }
     },
     "required": [
@@ -147,6 +190,17 @@ if parent_id is not None:
         if parent == task:
             raise UserError("Una tarea no puede ser su propia tarea padre.")
         vals['parent_id'] = parent.id
+if sequence is not None:
+    vals['sequence'] = sequence
+if tag_ids is not None:
+    tags = env['project.tags'].search([('id', 'in', tag_ids)])
+    if len(tags) != len(set(tag_ids)):
+        raise UserError("Alguna de las etiquetas indicadas no existe.")
+    vals['tag_ids'] = [(6, 0, tags.ids)]
+if stage_id is not None:
+    if stage_id not in task.project_id.type_ids.ids:
+        raise UserError("La etapa %s no es una etapa del proyecto de la tarea %s." % (stage_id, task.id))
+    vals['stage_id'] = stage_id
 if not vals:
     raise UserError("No se indicó ningún campo para actualizar.")
 updated = sorted(vals)
