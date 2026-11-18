@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 17:48+0000\n"
+"POT-Creation-Date: 2026-11-18 18:47+0000\n"
 "PO-Revision-Date: 2026-11-17 23:45+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -88,22 +88,6 @@ msgid ""
 msgstr ""
 "%(account)s en %(analytic)s%(partner)s: %(amount)s contra un saldo de "
 "%(balance)s"
-
-#. module: project_subcontracting
-#. odoo-python
-#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
-msgid "%(bill)s (%(vendor)s, %(state)s, %(paid)s)"
-msgstr "%(bill)s (%(vendor)s, %(state)s, %(paid)s)"
-
-#. module: project_subcontracting
-#. odoo-python
-#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
-msgid ""
-"%(entity)s in %(analytic)s would be left with %(balance)s. Its commission "
-"bills: %(bills)s"
-msgstr ""
-"%(entity)s en %(analytic)s quedaría con %(balance)s. Sus facturas de "
-"comisión: %(bills)s"
 
 #. module: project_subcontracting
 #. odoo-python
@@ -246,12 +230,6 @@ msgstr "Comisión"
 #: model:ir.model.fields,field_description:project_subcontracting.field_res_config_settings__provision_commission_percent
 msgid "Commission %"
 msgstr "% de comisión"
-
-#. module: project_subcontracting
-#. odoo-python
-#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
-msgid "Commission Bills"
-msgstr "Facturas de comisión"
 
 #. module: project_subcontracting
 #: model:ir.model.fields,field_description:project_subcontracting.field_res_company__provision_commission_expense_account_id
@@ -416,12 +394,6 @@ msgid ""
 msgstr ""
 "No se creó ninguna factura de proveedor:\n"
 "%s"
-
-#. module: project_subcontracting
-#. odoo-python
-#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
-msgid "Open the bills"
-msgstr "Abrir las facturas"
 
 #. module: project_subcontracting
 #: model:ir.model,name:project_subcontracting.model_account_partial_reconcile
@@ -627,26 +599,6 @@ msgstr ""
 " sumar más de 100."
 
 #. module: project_subcontracting
-#. odoo-python
-#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
-msgid ""
-"The commission was already billed, so this cannot be done:\n"
-"%(details)s\n"
-"\n"
-"To unblock it, in this order:\n"
-"1. If a bill is paid, break the reconciliation of its payment.\n"
-"2. Reset the bill to draft and cancel it.\n"
-"3. Repeat this operation."
-msgstr ""
-"La comisión ya se facturó, así que esto no se puede hacer:\n"
-"%(details)s\n"
-"\n"
-"Para desbloquearlo, en este orden:\n"
-"1. Si una factura está pagada, rompa la conciliación de su pago.\n"
-"2. Regrese la factura a borrador y cancélela.\n"
-"3. Repita esta operación."
-
-#. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_account_bank_statement_line__provision_origin_move_id
 #: model:ir.model.fields,help:project_subcontracting.field_account_move__provision_origin_move_id
 msgid "The customer invoice or credit note this provision entry comes from."
@@ -691,6 +643,16 @@ msgstr ""
 "%s"
 
 #. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/res_company.py:0
+msgid ""
+"The provision journal and expense accounts of %s must belong to it or to its "
+"parent company."
+msgstr ""
+"El diario de provisiones y las cuentas de gasto de %s deben ser suyos o de su"
+" compañía matriz."
+
+#. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_account_bank_statement_line__provision_partial_id
 #: model:ir.model.fields,help:project_subcontracting.field_account_move__provision_partial_id
 msgid ""
@@ -698,6 +660,18 @@ msgid ""
 msgstr ""
 "La conciliación que creó este asiento de provisión o esta factura de "
 "comisión."
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
+msgid ""
+"The reconciliation with %(counterpart)s (%(amount)s) provisions no "
+"commission: the lines %(lines)s carry commission, but the document has no "
+"salesperson. Their share (%(commission)s) stays in income."
+msgstr ""
+"La conciliación con %(counterpart)s (%(amount)s) no provisiona comisión: las "
+"líneas %(lines)s llevan comisión, pero el documento no tiene vendedor. Su "
+"parte (%(commission)s) se queda en ingresos."
 
 #. module: project_subcontracting
 #. odoo-python
@@ -726,6 +700,17 @@ msgstr ""
 #. odoo-python
 #: code:addons/project_subcontracting/models/account_move.py:0
 msgid ""
+"These documents have a provision from their payments: unreconcile the "
+"payments first, which reverses the provision, and then reset them to draft: "
+"%s"
+msgstr ""
+"Estos documentos tienen provisión de sus cobros: desconcilie primero los "
+"cobros, lo que revierte la provisión, y después regréselos a borrador: %s"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_move.py:0
+msgid ""
 "These lines are against a provision, so they need an analytic account: %s"
 msgstr ""
 "Estas líneas son contra una provisión, así que necesitan una cuenta "
@@ -740,16 +725,6 @@ msgid ""
 msgstr ""
 "Estas líneas se provisionan para la comisión o la implementación, así que "
 "necesitan una cuenta analítica: %s"
-
-#. module: project_subcontracting
-#. odoo-python
-#: code:addons/project_subcontracting/models/account_move.py:0
-msgid ""
-"These lines are provisioned for the commission, so the document needs a "
-"salesperson: %s"
-msgstr ""
-"Estas líneas se provisionan para la comisión, así que el documento necesita "
-"un vendedor: %s"
 
 #. module: project_subcontracting
 #. odoo-python
@@ -879,21 +854,3 @@ msgstr "su tarea no tiene costo de subcontratación por hora"
 #: code:addons/project_subcontracting/models/account_analytic_line.py:0
 msgid "its task is not done"
 msgstr "su tarea no está terminada"
-
-#. module: project_subcontracting
-#. odoo-python
-#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
-msgid "none"
-msgstr "ninguna"
-
-#. module: project_subcontracting
-#. odoo-python
-#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
-msgid "not paid"
-msgstr "no pagada"
-
-#. module: project_subcontracting
-#. odoo-python
-#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
-msgid "paid"
-msgstr "pagada"
