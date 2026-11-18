@@ -1,5 +1,5 @@
 from odoo import Command
-from odoo.exceptions import RedirectWarning, UserError
+from odoo.exceptions import UserError
 from odoo.tests import new_test_user, tagged
 
 from .common import ProvisionCase
@@ -60,46 +60,42 @@ class TestProvisionCorrection(ProvisionCase):
         self._register_payment(bill, payment_date='2026-11-13')
         return bill
 
-    def test_66_commission_already_billed_blocks_unreconciling(self):
+    def test_66_unreconcile_after_the_commission_was_paid(self):
+        """ CA-66 (R7.2): the commission provision may go negative; while it is, R6.2 rejects the
+        commission bills of that commercial entity in that analytic account, not those of another one. """
         self._e1()
-        bill = self._paid_commission_bill()
-        other = self._bill(self.beto.partner_id, [(self.commission_expense, 10.0)])
-        cancelled = self._bill(self.ana.partner_id, [(self.commission_provision, 10.0)])
-        cancelled.button_cancel()
-        with self.assertRaises(RedirectWarning) as caught, self.cr.savepoint():
-            self._unreconcile(self.f1)
-        message, action, button = caught.exception.args[:3]
-        self.assertIn(bill.name, message)
-        self.assertIn("Ana Pérez, Posted, paid", message)
-        for step in ("1. ", "2. ", "3. "):
-            self.assertIn(step, message)
-        self.assertEqual(action['res_model'], 'account.move')
-        # The button opens only the bill that blocks: not the one of another entity nor the cancelled one.
-        self.assertEqual([action['res_id']] if action.get('res_id') else action['domain'][0][2], [bill.id])
-        self.assertTrue(self.f1.payment_state in ('partial', 'in_payment'))
-
-    def test_67_unblocking(self):
-        self._e1()
-        bill = self._paid_commission_bill()
-        # 1. break the reconciliation of its payment; 2. reset it to draft and cancel it.
-        bill.line_ids.filtered(lambda line: line.account_id.account_type == 'liability_payable').remove_move_reconcile()
-        bill.button_draft()
-        bill.button_cancel()
-        entry = self._provision_entries()
+        self._paid_commission_bill()
         self._unreconcile(self.f1)
-        self.assertTrue(self.env['account.move'].search([('reversed_entry_id', '=', entry.id)]))
+        self.assertEqual(self._balance(self.commission_provision, self.analytic_x), -1000.0)
+        self.assertEqual(self._balance(self.commission_provision, self.analytic_y), -200.0)
+        with self.assertRaises(UserError):
+            self._bill(self.ana.partner_id, [(self.commission_provision, 100.0)], post=True)
+        # Beto has his own commission in AA-X: 600.00 from F3.
+        self._pay(self._f3(), 5800.0, '2026-11-11')
+        bill = self._bill(self.beto.partner_id, [(self.commission_provision, 600.0)], post=True)
+        self.assertEqual(bill.state, 'posted')
+
+    def test_67_a_new_collection_restores_the_balance(self):
+        """ CA-67 (R7.2, R6.2): reconciling P1 again brings the commission back to 0.00; its draft bill
+        cannot be posted, because that commission was already paid. """
+        payment = self._e1()
+        self._paid_commission_bill()
+        self._unreconcile(self.f1)
+        (self._receivable(self.f1) | self._receivable(payment.move_id)).reconcile()
         self.assertEqual(self._balance(self.commission_provision, self.analytic_x), 0.0)
+        bill = self._commission_bills().filtered(lambda move: move.state == 'draft')
+        self.assertEqual(len(bill), 1)
+        with self.assertRaises(UserError):
+            self._post_commission_bill(bill)
 
     def test_68_credit_note_returned_after_the_commission_was_billed(self):
+        """ CA-68 (R7.2): the credit note is reconciled and the commission of AA-X goes to -200.00. """
         self._e1()
         self._post_commission_bill(self._commission_bills())
         nc2 = self._nc2()
-        before = self._provision_entries()
-        with self.assertRaises(RedirectWarning) as caught, self.cr.savepoint():
-            self._pay(nc2, 1160.0, '2026-11-15')
-        self.assertIn("Posted, not paid", caught.exception.args[0])
-        self.assertEqual(self._provision_entries(), before)
-        self.assertEqual(nc2.payment_state, 'not_paid')
+        self._pay(nc2, 1160.0, '2026-11-15')
+        self.assertIn(nc2.payment_state, ('paid', 'in_payment'))
+        self.assertEqual(self._balance(self.commission_provision, self.analytic_x), -200.0)
 
     def test_69_negative_implementation_is_allowed_and_blocks_bills(self):
         self._e1()
@@ -108,6 +104,39 @@ class TestProvisionCorrection(ProvisionCase):
         self.assertEqual(self._balance(self.implementation_provision, self.analytic_x), -3750.0)
         with self.assertRaises(UserError):
             self._bill(self.carla, [(self.implementation_provision, 2000.0)], post=True)
+
+    def test_draft_needs_the_provision_reversed(self):
+        """ R7.5: a document with a provision does not go back to draft until its payments are
+        unreconciled; posted again with other percentages, the next reconciliation uses them. """
+        payment = self._e1()
+        with self.assertRaises(UserError):
+            self.f1.button_draft()
+        self._unreconcile(self.f1)
+        self.f1.button_draft()
+        self.company_a.write({'provision_commission_percent': 10.0, 'provision_implementation_percent': 60.0})
+        self.f1.action_post()
+        before = self._provision_entries()
+        (self._receivable(self.f1) | self._receivable(payment.move_id)).reconcile()
+        entry = self._provision_entries() - before
+        self.assertEqual(
+            sorted(entry.line_ids.filtered(lambda item: item.account_id.provision_type).mapped('credit')),
+            [100.0, 500.0, 3000.0],
+        )
+
+    def test_deleting_a_reversed_line(self):
+        """ A line whose provision was reversed can be deleted: its items lose the link and nothing is
+        left open. """
+        self._e1()
+        self._unreconcile(self.f1)
+        self.f1.button_draft()
+        self.f1.write({'invoice_line_ids': [Command.delete(self.f1_y.id)]})
+        items = self.env['account.move.line'].search([
+            ('account_id', '=', self.commission_provision.id), ('analytic_distribution', 'in', self.analytic_y.ids),
+            ('parent_state', '=', 'posted'),
+        ])
+        self.assertEqual(len(items), 2)
+        self.assertFalse(items.provision_origin_line_id)
+        self.assertEqual(self._balance(self.commission_provision, self.analytic_y), 0.0)
 
     def test_70_entry_cannot_go_back_to_draft(self):
         self._e1()

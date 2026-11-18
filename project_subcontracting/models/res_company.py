@@ -15,15 +15,15 @@ class ResCompany(models.Model):
              "The company keeps the rest as income.",
     )
     provision_commission_expense_account_id = fields.Many2one(
-        'account.account', string="Commission Expense", check_company=True,
+        'account.account', string="Commission Expense",
         help="Account charged with the commission when it is provisioned.",
     )
     provision_implementation_expense_account_id = fields.Many2one(
-        'account.account', string="Implementation Cost", check_company=True,
+        'account.account', string="Implementation Cost",
         help="Account charged with the implementation cost when it is provisioned.",
     )
     provision_journal_id = fields.Many2one(
-        'account.journal', string="Provision Journal", check_company=True, domain="[('type', '=', 'general')]",
+        'account.journal', string="Provision Journal", domain="[('type', '=', 'general')]",
         help="Journal of the provision entries.",
     )
 
@@ -34,6 +34,23 @@ class ResCompany(models.Model):
             if commission < 0 or implementation < 0 or commission + implementation > 100:
                 raise ValidationError(self.env._(
                     "The commission and implementation percentages of %s cannot be negative and cannot add up to more than 100.",
+                    company.display_name,
+                ))
+
+    @api.constrains(
+        'provision_journal_id', 'provision_commission_expense_account_id', 'provision_implementation_expense_account_id',
+    )
+    def _check_provision_company(self):
+        """ The journal and the expense accounts of the provision belong to the company or to one of its
+        parents, as Odoo lets branches use the accounts of their parent company. """
+        for company in self:
+            journal = company.provision_journal_id
+            accounts = company.provision_commission_expense_account_id | company.provision_implementation_expense_account_id
+            if (journal and journal.company_id not in company.parent_ids) or accounts.filtered(
+                lambda account: not account.company_ids & company.parent_ids,
+            ):
+                raise ValidationError(self.env._(
+                    "The provision journal and expense accounts of %s must belong to it or to its parent company.",
                     company.display_name,
                 ))
 

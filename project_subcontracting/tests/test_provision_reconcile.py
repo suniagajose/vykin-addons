@@ -246,6 +246,44 @@ class TestProvisionReconcile(ProvisionCase):
             sorted([((str(self.analytic_x.id),), 600.0), ((str(self.analytic_y.id),), 400.0)]),
         )
 
+    def test_35_bill_line_against_the_own_commission_account(self):
+        """ R4.1: the line of the commission bill is against the provision account of the sold line,
+        so a product with its own commission account can be paid against it. """
+        invoice = self._invoice(
+            [{'product': self.partners_advice, 'price': 1000.0, 'analytic': {self.analytic_x.id: 100}}],
+            salesperson=self.ana, post=True, taxed=True,
+        )
+        self._pay(invoice, 1160.0, '2026-11-10')
+        bill = self._commission_bills()
+        self.assertEqual(bill.invoice_line_ids.account_id, self.partners_provision)
+        bill.invoice_date = '2026-11-12'
+        bill.action_post()
+        self.assertEqual(bill.state, 'posted')
+
+    def _unprovisioned_note(self, move):
+        return move.message_ids.filtered(lambda message: "provisions no commission" in (message.body or ""))
+
+    def test_36_no_salesperson_leaves_the_commission_in_income(self):
+        """ R3.6: without a salesperson, a reconciliation provisions only the implementation, creates no
+        commission bill and says on the document how much commission stays in income. """
+        invoice = self._invoice([self.line_x, self.line_y], post=True, taxed=True)
+        self._pay(invoice, 6960.0, '2026-11-10')
+        self.assertEqual(
+            sorted((code, credit) for code, _debit, credit, _partner, _analytic in self._items(self._provision_entries()) if credit),
+            [('205.02.03', 3750.0)],
+        )
+        self.assertFalse(self._commission_bills())
+        note = self._unprovisioned_note(invoice)
+        self.assertEqual(len(note), 1)
+        self.assertIn("1,200.00", note.body)
+
+    def test_36_salesperson_removed_after_posting(self):
+        """ R3.6: the salesperson that counts is the one of the document when it is reconciled. """
+        self.f1.invoice_user_id = False
+        self._e1()
+        self.assertFalse(self._commission_bills())
+        self.assertTrue(self._unprovisioned_note(self.f1))
+
     def test_39_implementation_only(self):
         invoice = self._invoice(
             [{'product': self.support, 'price': 1000.0, 'analytic': {self.analytic_x.id: 100}}],

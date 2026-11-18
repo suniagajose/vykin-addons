@@ -113,10 +113,10 @@ class TestProvisionInvoice(ProvisionCommon):
         self.assertEqual(invoice.state, 'draft')
 
     def test_17_commission_without_salesperson(self):
+        """ CA-17 (R2.3, R3.6): a missing salesperson does not block posting. """
         invoice = self._invoice([{**self.line_license, 'price': 1000.0}])
-        with self.assertRaises(UserError) as caught:
-            invoice.action_post()
-        self.assertIn("Licencia", str(caught.exception))
+        invoice.action_post()
+        self.assertEqual((invoice.state, self._percents(invoice)), ('posted', [(20, 0)]))
 
     def test_18_implementation_alone_needs_no_salesperson(self):
         invoice = self._invoice([
@@ -127,7 +127,7 @@ class TestProvisionInvoice(ProvisionCommon):
         self.assertEqual(self._percents(invoice), [(0, 75), (0, 0)])
 
     def test_19_credit_note_without_salesperson(self):
+        """ CA-19 (R2.3): nor for a credit note. """
         credit_note = self._invoice([{**self.line_consulting, 'price': 500.0}], move_type='out_refund')
-        with self.assertRaises(UserError) as caught:
-            credit_note.action_post()
-        self.assertIn("Consultoría", str(caught.exception))
+        credit_note.action_post()
+        self.assertEqual(credit_note.state, 'posted')

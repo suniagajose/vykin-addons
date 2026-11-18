@@ -28,8 +28,8 @@ class AccountMove(models.Model):
 
     def _post(self, soft=True):
         # The values are those of the moment of posting (R2.1), and a line that provisions needs its
-        # analytic account and its salesperson (R2.3). They are set before posting: a credit note with
-        # an origin is reconciled with it while it is posted, and that reconciliation provisions.
+        # analytic account (R2.3). They are set before posting: a credit note with an origin is
+        # reconciled with it while it is posted, and that reconciliation provisions.
         for move in self.filtered(lambda move: move.state == 'draft' and move.move_type in ('out_invoice', 'out_refund')):
             lines = move.invoice_line_ids.filtered(lambda line: line.display_type == 'product')
             line_values = {line: line._get_provision_values() for line in lines}
@@ -87,24 +87,31 @@ class AccountMove(models.Model):
             consumed[key] += amount
 
     def _check_provision_lines(self, line_percents):
-        """ A line with a percentage needs an analytic distribution, and one with a commission needs
-        a salesperson on its document (R2.3). """
+        """ A line with a percentage needs an analytic distribution (R2.3). A missing salesperson does
+        not block: the reconciliation leaves its commission in income and says so (R3.6). """
         self.ensure_one()
-        no_analytic = [
+        if no_analytic := [
             line for line, values in line_percents.items()
             if (values['provision_commission_percent'] or values['provision_implementation_percent'])
             and not line.analytic_distribution
-        ]
-        no_salesperson = [
-            line for line, values in line_percents.items() if values['provision_commission_percent']
-        ] if not self.invoice_user_id else []
-        if no_analytic:
+        ]:
             raise UserError(self.env._(
                 "These lines are provisioned for the commission or the implementation, so they need an "
                 "analytic account: %s", [line.name or line.product_id.display_name for line in no_analytic],
             ))
-        if no_salesperson:
-            raise UserError(self.env._(
-                "These lines are provisioned for the commission, so the document needs a salesperson: %s",
-                [line.name or line.product_id.display_name for line in no_salesperson],
-            ))
+
+    def _check_draftable(self):
+        """ A customer invoice or credit note does not go back to draft while a reconciliation keeps a
+        provision of it: its lines would no longer match their entries. Unreconciling its payments
+        reverses that provision first (R7.5). """
+        super()._check_draftable()
+        if documents := self.filtered(lambda move: move.move_type in ('out_invoice', 'out_refund')):
+            # sudo: the provision entries are system data; whoever resets the document must hear of them.
+            if provisioned := self.sudo().search([
+                ('provision_origin_move_id', 'in', documents.ids), ('provision_partial_id', '!=', False),
+            ]).provision_origin_move_id:
+                raise UserError(self.env._(
+                    "These documents have a provision from their payments: unreconcile the payments first, "
+                    "which reverses the provision, and then reset them to draft: %s",
+                    provisioned.with_env(self.env).mapped('display_name'),
+                ))
