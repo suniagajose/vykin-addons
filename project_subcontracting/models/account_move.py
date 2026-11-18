@@ -46,7 +46,8 @@ class AccountMove(models.Model):
         for bill in self.filtered(lambda move: move.state == 'draft' and move.move_type in ('in_invoice', 'in_receipt')):
             bill._check_provision_consumption(consumed)
         posted = super()._post(soft=soft)
-        for partial in draft_partials.sorted('id'):
+        # exists: posting may delete a reconciliation whose cash basis values changed.
+        for partial in draft_partials.exists().sorted('id'):
             partial._create_provision(posted & drafts)
         return posted
 

@@ -164,6 +164,14 @@ class TestProvisionCorrection(ProvisionCase):
         with self.assertRaises(UserError):
             self._provision_entries().button_draft()
 
+    def test_analytic_distribution_of_an_entry_cannot_be_changed(self):
+        """ The hash does not cover it and the balances of the provision read it. """
+        self._e1()
+        item = self._provision_entries().line_ids[:1]
+        with self.assertRaises(UserError):
+            item.analytic_distribution = {str(self.analytic_y.id): 100.0}
+        self.assertEqual(self._balance(self.commission_provision, self.analytic_x), 1000.0)
+
     def test_71_entry_cannot_be_changed(self):
         self._e1()
         entry = self._provision_entries()

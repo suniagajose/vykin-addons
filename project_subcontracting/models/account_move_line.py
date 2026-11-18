@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 from odoo import fields, models
+from odoo.exceptions import UserError
 
 
 class AccountMoveLine(models.Model):
@@ -30,6 +31,15 @@ class AccountMoveLine(models.Model):
         'account.move.line', string="Provisioned Line", readonly=True, index='btree_not_null', ondelete='set null',
         help="The invoice or credit note line this provision item comes from.",
     )
+
+    def write(self, vals):
+        # The hash of the journal covers the amounts and accounts of an item, not its analytic distribution,
+        # which the balances of the provision (R6) read: it cannot move a provision to another project.
+        if 'analytic_distribution' in vals and self.filtered(
+            lambda line: line.provision_origin_line_id and line.parent_state == 'posted',
+        ):
+            raise UserError(self.env._("The analytic distribution of a posted provision entry cannot be changed."))
+        return super().write(vals)
 
     def _get_provision_values(self):
         """ Return the values this line of a customer invoice or credit note keeps when its document is
