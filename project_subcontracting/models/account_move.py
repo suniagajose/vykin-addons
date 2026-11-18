@@ -30,17 +30,25 @@ class AccountMove(models.Model):
         # The values are those of the moment of posting (R2.1), and a line that provisions needs its
         # analytic account (R2.3). They are set before posting: a credit note with an origin is
         # reconciled with it while it is posted, and that reconciliation provisions.
-        for move in self.filtered(lambda move: move.state == 'draft' and move.move_type in ('out_invoice', 'out_refund')):
+        drafts = self.filtered(lambda move: move.state == 'draft' and move.move_type in ('out_invoice', 'out_refund'))
+        for move in drafts:
             lines = move.invoice_line_ids.filtered(lambda line: line.display_type == 'product')
             line_values = {line: line._get_provision_values() for line in lines}
             move._check_provision_lines(line_values)
             for line, values in line_values.items():
                 line.write(values)
+        # A draft can be paid (the Pay button): its reconciliations had no percentages to provision, so
+        # they are provisioned once it is posted (R3.7). Those created while posting already were.
+        receivable = drafts.line_ids.filtered(lambda line: line.account_id.account_type == 'asset_receivable')
+        draft_partials = receivable.matched_debit_ids | receivable.matched_credit_ids
         # What the bills of this batch consume of a provision counts for the next ones.
         consumed = defaultdict(float)
         for bill in self.filtered(lambda move: move.state == 'draft' and move.move_type in ('in_invoice', 'in_receipt')):
             bill._check_provision_consumption(consumed)
-        return super()._post(soft=soft)
+        posted = super()._post(soft=soft)
+        for partial in draft_partials.sorted('id'):
+            partial._create_provision(posted & drafts)
+        return posted
 
     def _check_provision_consumption(self, consumed):
         """ A vendor bill or receipt cannot consume more of a provision than its balance in an analytic
@@ -51,9 +59,9 @@ class AccountMove(models.Model):
         lines = self.invoice_line_ids.filtered(lambda line: line.display_type == 'product' and line.account_id.provision_type)
         if not lines:
             return
-        if no_analytic := lines.filtered(lambda line: not line.analytic_distribution):
+        if no_analytic := lines.filtered(lambda line: not line._has_provision_analytic()):
             raise UserError(self.env._(
-                "These lines are against a provision, so they need an analytic account: %s",
+                "These lines are against a provision, so they need an analytic account of the project plan: %s",
                 [line.name or line.account_id.display_name for line in no_analytic],
             ))
         no_partner = self.env['res.partner']
@@ -93,11 +101,11 @@ class AccountMove(models.Model):
         if no_analytic := [
             line for line, values in line_percents.items()
             if (values['provision_commission_percent'] or values['provision_implementation_percent'])
-            and not line.analytic_distribution
+            and not line._has_provision_analytic()
         ]:
             raise UserError(self.env._(
                 "These lines are provisioned for the commission or the implementation, so they need an "
-                "analytic account: %s", [line.name or line.product_id.display_name for line in no_analytic],
+                "analytic account of the project plan: %s", [line.name or line.product_id.display_name for line in no_analytic],
             ))
 
     def _check_draftable(self):

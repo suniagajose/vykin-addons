@@ -12,21 +12,24 @@ class AccountPartialReconcile(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         partials = super().create(vals_list)
-        # In order, so that each one sees what the earlier ones provisioned (R3.3).
         for partial in partials.sorted('id'):
             partial._create_provision()
         return partials
 
-    def _create_provision(self):
-        """ Provision what this reconciliation brings in for each customer invoice or credit note it
-        reconciles, and create the commission bill of each salesperson (R3, R4). """
+    def _create_provision(self, only=None):
+        """ Provision what this reconciliation brings in for each posted customer invoice or credit note it
+        reconciles (only those of ``only``, if given), and create the commission bill of each salesperson
+        (R3, R4). """
         self.ensure_one()
         # {salesperson: {(provision account, analytic account id): net}}
         commission_net = defaultdict(lambda: defaultdict(float))
         documents = self.env['account.move']
         for line, counterpart in ((self.debit_move_id, self.credit_move_id), (self.credit_move_id, self.debit_move_id)):
             document = line.move_id
-            if document.move_type not in ('out_invoice', 'out_refund') or line.account_id.account_type != 'asset_receivable':
+            if (
+                document.move_type not in ('out_invoice', 'out_refund') or document.state != 'posted'
+                or line.account_id.account_type != 'asset_receivable' or (only is not None and document not in only)
+            ):
                 continue
             if self._create_provision_entry(document, line, counterpart.move_id, commission_net):
                 documents |= document
@@ -51,6 +54,15 @@ class AccountPartialReconcile(models.Model):
             } for entry in entries], cancel=True)
         return super().unlink()
 
+    def _get_receivable_amounts(self, document):
+        """ Return {reconciliation: amount} that each reconciliation of the receivable of ``document``
+        covers, in its currency. """
+        receivable = document.line_ids.filtered(lambda aml: aml.account_id.account_type == 'asset_receivable')
+        return {
+            partial: partial.debit_amount_currency if partial.debit_move_id in receivable else partial.credit_amount_currency
+            for partial in receivable.matched_debit_ids | receivable.matched_credit_ids
+        }
+
     def _get_provision_portion(self, document, line):
         """ Return the share of the document this reconciliation covers and whether it is the one that
         leaves the document fully reconciled, both in the currency of the document (R3.1, R3.3). """
@@ -59,12 +71,17 @@ class AccountPartialReconcile(models.Model):
         # An exchange difference reconciles no amount in the currency of the document.
         if currency.is_zero(amount) or currency.is_zero(document.amount_total):
             return 0.0, False
-        receivable = document.line_ids.filtered(lambda aml: aml.account_id.account_type == 'asset_receivable')
-        reconciled = sum(
-            partial.debit_amount_currency if partial.debit_move_id in receivable else partial.credit_amount_currency
-            for partial in (receivable.matched_debit_ids | receivable.matched_credit_ids).filtered(lambda p: p.id <= self.id)
-        )
+        reconciled = sum(amount for partial, amount in self._get_receivable_amounts(document).items() if partial.id <= self.id)
         return amount / document.amount_total, currency.compare_amounts(reconciled, document.amount_total) >= 0
+
+    def _get_earlier_portions(self, document):
+        """ The shares of the document that the earlier reconciliations covered. """
+        currency = document.currency_id
+        return [
+            amount / document.amount_total
+            for partial, amount in self._get_receivable_amounts(document).items()
+            if partial.id < self.id and not currency.is_zero(amount)
+        ]
 
     def _get_provision_date(self, journal):
         """ The most recent date of the two documents or, if it is locked, the first open one (R3.4). """
@@ -97,7 +114,7 @@ class AccountPartialReconcile(models.Model):
         # sudo: a reconciliation provisions on behalf of the system, whoever registers the payment
         # (an accountant may have no access to sales or purchases).
         partner = document.invoice_user_id.sudo().partner_id.commercial_partner_id
-        provisioned = self._get_provisioned_so_far(provisioned_lines) if is_last else {}
+        earlier_portions = self._get_earlier_portions(document) if is_last else []
         name = f"{document.name} - {counterpart_move.display_name}"
         salesperson = document.invoice_user_id
         line_vals_list = []
@@ -109,8 +126,10 @@ class AccountPartialReconcile(models.Model):
                     continue
                 target = -provisioned_line.balance * percent / 100.0
                 if is_last:
-                    # What is still missing, so that the line is provisioned to the cent (R3.3).
-                    amount = currency.round(target) - provisioned.get((provisioned_line.id, role), 0.0)
+                    # What is still due after the earlier reconciliations, so that the cents of the rounding
+                    # are settled (R3.3). What an earlier one left in income, for want of a salesperson,
+                    # stays in income (R3.6).
+                    amount = currency.round(target) - sum(currency.round(target * portion) for portion in earlier_portions)
                 else:
                     amount = currency.round(target * portion)
                 if currency.is_zero(amount):
@@ -169,20 +188,6 @@ class AccountPartialReconcile(models.Model):
             ),
             subtype_xmlid='mail.mt_note',
         )
-
-    def _get_provisioned_so_far(self, lines):
-        """ Return {(line id, role): amount} that the posted provision entries already provisioned of these
-        lines, reversals included (R3.3). """
-        provisioned = defaultdict(float)
-        # sudo: system data, read for whoever reconciles the document.
-        items = self.env['account.move.line'].sudo().search_fetch([
-            ('provision_origin_line_id', 'in', lines.ids),
-            ('account_id.provision_type', '!=', False),
-            ('parent_state', '=', 'posted'),
-        ], ['provision_origin_line_id', 'account_id', 'balance'])
-        for item in items:
-            provisioned[item.provision_origin_line_id.id, item.account_id.provision_type] -= item.balance
-        return provisioned
 
     def _create_commission_bills(self, documents, commission_net):
         """ Create a draft vendor bill for each salesperson whose commission provision of this
