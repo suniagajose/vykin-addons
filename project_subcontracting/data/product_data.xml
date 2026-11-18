@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
 
+    <record id="product_commission" model="product.product">
+        <field name="name">Sales Commission</field>
+        <field name="type">service</field>
+        <field name="sale_ok" eval="False"/>
+        <field name="purchase_ok" eval="True"/>
+        <field name="supplier_taxes_id" eval="[Command.clear()]"/>
+    </record>
+
     <record id="product_subcontracted_hours" model="product.product">
         <field name="name">Subcontracted Hours</field>
         <field name="type">service</field>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.form.inherit.project_subcontracting</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block id="invoicing_settings" position="before">
+                <block title="Payment Provision" name="provision_setting_container">
+                    <setting id="provision_percents" string="Shares" company_dependent="1"
+                        help="What each customer payment of a product with a provision account sets aside; the company keeps the rest as income">
+                        <div class="content-group">
+                            <div class="row mt8">
+                                <label for="provision_commission_percent" class="col-lg-5 o_light_label"/>
+                                <field name="provision_commission_percent"/>
+                            </div>
+                            <div class="row">
+                                <label for="provision_implementation_percent" class="col-lg-5 o_light_label"/>
+                                <field name="provision_implementation_percent"/>
+                            </div>
+                        </div>
+                    </setting>
+                    <setting id="provision_accounting" string="Accounting" company_dependent="1"
+                        help="Expense accounts the provisions are charged to, and the journal of the provision entries">
+                        <div class="content-group">
+                            <div class="row mt8">
+                                <label for="provision_commission_expense_account_id" class="col-lg-5 o_light_label"/>
+                                <field name="provision_commission_expense_account_id"/>
+                            </div>
+                            <div class="row">
+                                <label for="provision_implementation_expense_account_id" class="col-lg-5 o_light_label"/>
+                                <field name="provision_implementation_expense_account_id"/>
+                            </div>
+                            <div class="row">
+                                <label for="provision_journal_id" class="col-lg-5 o_light_label"/>
+                                <field name="provision_journal_id"/>
+                            </div>
+                        </div>
+                    </setting>
+                </block>
+            </block>
+        </field>
+    </record>
+
+</odoo>

@@ -24,3 +24,27 @@ class ProjectProject(models.Model):
             raise ValidationError(self.env._(
                 "Subcontracting needs the timesheets of the project: %s", ", ".join(projects.mapped('display_name')),
             ))
+
+    def write(self, vals):
+        result = super().write(vals)
+        if not {'allow_subcontracting', 'allow_timesheets', 'active'}.isdisjoint(vals):
+            self._check_provision_products()
+        return result
+
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_provision_products(self):
+        self._check_provision_products(deleting=True)
+
+    def _check_provision_products(self, deleting=False):
+        """ A project template used by a product with a provision account keeps Subcontracting, and is
+        neither archived nor deleted (R1.5.1). """
+        if templates := self.filtered('is_template'):
+            # sudo: whoever changes a template must hear about the products that depend on it.
+            products = self.env['product.template'].sudo().search([('project_template_id', 'in', templates.ids)])
+            if wrong := products.filtered(
+                lambda product: product._has_provision_account() and (deleting or not product._has_provision_project()),
+            ):
+                raise ValidationError(self.env._(
+                    "These products have a provision account and need their project template to stay active "
+                    "with Subcontracting: %s", wrong.mapped('display_name'),
+                ))

@@ -25,6 +25,7 @@ with them.
     'depends': [
         'hr_timesheet',
         'account',
+        'sale_project',
     ],
     'data': [
         'data/product_data.xml',
@@ -32,5 +33,10 @@ with them.
         'views/project_project_views.xml',
         'views/project_task_views.xml',
         'views/account_analytic_line_views.xml',
+        'views/account_account_views.xml',
+        'views/product_category_views.xml',
+        'views/product_template_views.xml',
+        'views/res_config_settings_views.xml',
     ],
+    'post_init_hook': '_setup_companies',
 }
