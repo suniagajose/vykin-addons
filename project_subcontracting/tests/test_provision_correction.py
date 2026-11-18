@@ -37,6 +37,27 @@ class TestProvisionCorrection(ProvisionCase):
                                     (self.implementation_provision, self.analytic_x)):
             self.assertEqual(self._balance(provision, analytic), 0.0)
 
+    def test_payment_back_to_draft_keeps_the_provision(self):
+        """ Returning the payment to draft does not unreconcile it: the provision follows the reconciliation. """
+        payment = self._e1()
+        entry, bill = self._provision_entries(), self._commission_bills()
+        payment.action_draft()
+        payment.action_post()
+        self.assertEqual(self._provision_entries(), entry)
+        self.assertEqual(self._commission_bills(), bill)
+        self.assertEqual(entry.state, 'posted')
+        self.assertEqual(bill.state, 'draft')
+        self.assertEqual(self._balance(self.commission_provision, self.analytic_x), 1000.0)
+
+    def test_payment_cancelled_reverses_the_provision(self):
+        payment = self._e1()
+        entry, bill = self._provision_entries(), self._commission_bills()
+        payment.action_draft()
+        payment.action_cancel()
+        self.assertTrue(self.env['account.move'].search([('reversed_entry_id', '=', entry.id)]))
+        self.assertEqual(bill.state, 'cancel')
+        self.assertEqual(self._balance(self.commission_provision, self.analytic_x), 0.0)
+
     def test_64_reversal_in_a_locked_period(self):
         self._e1()
         self.company_a.fiscalyear_lock_date = '2026-11-30'

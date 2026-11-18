@@ -117,13 +117,13 @@ class TestProvisionReconcile(ProvisionCase):
         )
 
     def test_25_foreign_currency_uses_the_portion_in_the_document_currency(self):
-        usd = self.setup_other_currency('EUR', rates=[('2026-01-01', 0.05), ('2026-11-10', 1 / 21.0)])
+        eur = self.setup_other_currency('EUR', rates=[('2026-01-01', 0.05), ('2026-11-10', 1 / 21.0)])
         invoice = self._invoice(
             [{**self.line_y, 'price': 1000.0}], salesperson=self.beto, date='2026-11-03', post=True, taxed=True,
-            currency_id=usd.id,
+            currency_id=eur.id,
         )
         self.assertEqual(invoice.amount_total, 1160.0)
-        self._pay(invoice, 580.0, '2026-11-10', currency=usd)
+        self._pay(invoice, 580.0, '2026-11-10', currency=eur)
         entries = self._provision_entries().filtered(lambda entry: entry.provision_origin_move_id == invoice)
         self.assertEqual(len(entries), 1)
         self.assertEqual(
@@ -369,3 +369,25 @@ class TestProvisionReconcile(ProvisionCase):
             sorted([('501.02.02', 750.0, 0.0), ('205.02.03', 0.0, 750.0)]),
         )
         self.assertFalse(self._commission_bills())
+
+    def test_provision_of_the_company_of_the_document(self):
+        """ A credit note reconciled with an invoice of a branch (shared receivable account) is provisioned in
+        its own company, not in the one of the reconciliation. """
+        branch = self.env['res.company'].create({
+            'name': "Branch", 'parent_id': self.company_a.id, 'currency_id': self.company_a.currency_id.id,
+        })
+        self.env.user.company_ids |= branch
+        receivable = self._receivable(self.f1).account_id
+        receivable.company_ids |= branch
+        invoice = self.env['account.move'].with_company(branch).create({
+            'move_type': 'out_invoice', 'partner_id': self.partner_a.id, 'invoice_date': '2026-11-12',
+            'invoice_line_ids': [Command.create({'name': "Branch", 'quantity': 1, 'price_unit': 1160.0, 'tax_ids': [Command.clear()],
+                                                 'account_id': self.company_data['default_account_revenue'].id})],
+        })
+        invoice.line_ids.filtered(lambda line: line.account_id.account_type == 'asset_receivable').account_id = receivable
+        invoice.action_post()
+        credit_note = self._credit_note([{**self.line_x, 'price': 1000.0}], date='2026-11-14')
+        (self._receivable(invoice) | self._receivable(credit_note)).reconcile()
+        entries = self._provision_entries().filtered(lambda entry: entry.provision_origin_move_id == credit_note)
+        self.assertEqual(entries.company_id, self.company_a)
+        self.assertEqual(entries.journal_id, self.company_a.provision_journal_id)
