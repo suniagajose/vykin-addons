@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="product_subcontracted_hours" model="product.product">
+        <field name="name">Subcontracted Hours</field>
+        <field name="type">service</field>
+        <field name="sale_ok" eval="False"/>
+        <field name="purchase_ok" eval="True"/>
+        <field name="uom_id" ref="uom.product_uom_hour"/>
+        <field name="supplier_taxes_id" eval="[Command.clear()]"/>
+    </record>
+
+</odoo>

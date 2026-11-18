@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_bill_subcontracted_hours" model="ir.actions.server">
+        <field name="name">Bill Hours</field>
+        <field name="model_id" ref="analytic.model_account_analytic_line"/>
+        <field name="binding_model_id" ref="analytic.model_account_analytic_line"/>
+        <field name="binding_view_types">list</field>
+        <field name="group_ids" eval="[Command.link(ref('account.group_account_invoice'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_bill_subcontracted_hours()</field>
+    </record>
+
+</odoo>

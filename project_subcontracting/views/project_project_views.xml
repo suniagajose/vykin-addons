@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="project_invoice_form" model="ir.ui.view">
+        <field name="name">project.project.form.inherit.project_subcontracting</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="hr_timesheet.project_invoice_form"/>
+        <field name="arch" type="xml">
+            <!-- An option of the Timesheets setting: it moves with it wherever another module puts it. -->
+            <setting id="timesheet_settings" position="inside">
+                <div class="content-group" invisible="not allow_timesheets">
+                    <div class="mt8">
+                        <field name="allow_subcontracting" class="w-auto me-2"/>
+                        <label for="allow_subcontracting"/>
+                        <div class="text-muted">Pay each assignee the hours they log, with a vendor bill</div>
+                    </div>
+                </div>
+            </setting>
+        </field>
+    </record>
+
+</odoo>

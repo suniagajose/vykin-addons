@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_timesheet_line_tree" model="ir.ui.view">
+        <field name="name">account.analytic.line.list.inherit.project_subcontracting</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+        <field name="arch" type="xml">
+            <field name="unit_amount" position="after">
+                <field name="subcontracting_bill_id" optional="hide" groups="account.group_account_invoice"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="action_my_subcontracting_billable_timesheets" model="ir.actions.act_window">
+        <field name="name">My Subcontracted Hours to Bill</field>
+        <field name="res_model">account.analytic.line</field>
+        <field name="path">my-subcontracted-hours-to-bill</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="hr_timesheet.timesheet_view_tree_user"/>
+        <field name="search_view_id" ref="hr_timesheet.hr_timesheet_line_search"/>
+        <field name="domain">[('subcontracting_billable', '=', True), ('user_id', '=', uid)]</field>
+        <field name="context">{'is_timesheet': 1, 'create': 0, 'search_default_groupby_project': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No hours to bill</p>
+            <p>The hours you log on done tasks of projects with Subcontracting appear here until
+                they are on a vendor bill.</p>
+        </field>
+    </record>
+
+    <record id="action_subcontracting_billable_timesheets" model="ir.actions.act_window">
+        <field name="name">Subcontracted Hours to Bill</field>
+        <field name="res_model">account.analytic.line</field>
+        <field name="path">subcontracted-hours-to-bill</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="hr_timesheet.timesheet_view_tree_user"/>
+        <field name="search_view_id" ref="hr_timesheet.hr_timesheet_line_search"/>
+        <field name="domain">[('subcontracting_billable', '=', True)]</field>
+        <field name="context">{'is_timesheet': 1, 'create': 0, 'search_default_groupby_employee': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No hours to bill</p>
+            <p>The hours that assignees log on done tasks of projects with Subcontracting appear here.
+                Select them and use Bill Hours to create a draft vendor bill for each collaborator.</p>
+        </field>
+    </record>
+
+    <!-- Next to To Validate: timesheets are validated first, then billed. -->
+    <menuitem id="menu_subcontracting_to_bill"
+        name="To Bill"
+        parent="hr_timesheet.timesheet_menu_root"
+        sequence="25">
+        <menuitem id="menu_my_subcontracting_billable_timesheets"
+            name="My Subcontracted Hours"
+            action="action_my_subcontracting_billable_timesheets"
+            groups="hr_timesheet.group_hr_timesheet_user"
+            sequence="10"/>
+        <menuitem id="menu_subcontracting_billable_timesheets"
+            name="All Subcontracted Hours"
+            action="action_subcontracting_billable_timesheets"
+            groups="account.group_account_invoice"
+            sequence="20"/>
+    </menuitem>
+
+</odoo>

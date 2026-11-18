@@ -1,0 +1,310 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* project_subcontracting
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-18 16:27+0000\n"
+"PO-Revision-Date: 2026-11-18 16:27+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: project_subcontracting
+#: model:ir.module.module,description:base.module_project_subcontracting
+msgid ""
+"\n"
+"Project Subcontracting\n"
+"======================\n"
+"Projects marked as *Subcontracting* run their tasks with subcontracted implementers.\n"
+"*Subcontracting* is an option of *Timesheets*: it only shows with them and is turned off\n"
+"with them.\n"
+"\n"
+"* Each task of these projects has a subcontracting hour cost.\n"
+"* The hours an assignee logs on a done task are *to bill*. *Bill Hours*, on the chosen\n"
+"  timesheets, creates one draft vendor bill per collaborator, with a *Subcontracted Hours*\n"
+"  line per task: the hours, the task's hour cost and the project's analytic account.\n"
+"* Each timesheet is linked to its bill line and cannot be changed or deleted while the\n"
+"  bill is not cancelled.\n"
+"* The task warns about what departs from that flow: an hour cost of 0, hours logged by\n"
+"  someone not assigned, hours to bill on a done task, and hours over the planned ones.\n"
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/project_task.py:0
+msgid ""
+"%(logged)s hours were logged and %(planned)s were planned: the extra hours "
+"are billed at the task's cost and take provision meant for other tasks. "
+"Adjust the planned hours or decide whether to pay them."
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/project_task.py:0
+msgid "%(product)s - %(task)s"
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/project_task.py:0
+msgid ""
+"%(user)s has %(hours)s hours to bill: use Bill Hours on their timesheets."
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/project_task.py:0
+msgid ""
+"%(user)s logged %(hours)s hours without being assigned: they cannot be "
+"billed. Assign them to the task to bill their hours."
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_analytic_line.py:0
+msgid "%s is not assigned to its task"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.ui.menu,name:project_subcontracting.menu_subcontracting_billable_timesheets
+msgid "All Subcontracted Hours"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model,name:project_subcontracting.model_account_analytic_line
+msgid "Analytic Line"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.actions.server,name:project_subcontracting.action_bill_subcontracted_hours
+msgid "Bill Hours"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.module.module,summary:base.module_project_subcontracting
+msgid "Bill the hours logged by subcontracted implementers on vendor bills"
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_analytic_line.py:0
+msgid "Choose the timesheets to bill."
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_analytic_line__display_name
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_move__display_name
+#: model:ir.model.fields,field_description:project_subcontracting.field_project_project__display_name
+#: model:ir.model.fields,field_description:project_subcontracting.field_project_task__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_analytic_line__id
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_move__id
+#: model:ir.model.fields,field_description:project_subcontracting.field_project_project__id
+#: model:ir.model.fields,field_description:project_subcontracting.field_project_task__id
+msgid "ID"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model,name:project_subcontracting.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_account_analytic_line__subcontracting_billable
+msgid ""
+"Logged by an assignee on a done task of a project with Subcontracting, and "
+"not billed yet."
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.ui.menu,name:project_subcontracting.menu_my_subcontracting_billable_timesheets
+msgid "My Subcontracted Hours"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.actions.act_window,name:project_subcontracting.action_my_subcontracting_billable_timesheets
+msgid "My Subcontracted Hours to Bill"
+msgstr ""
+
+#. module: project_subcontracting
+#: model_terms:ir.actions.act_window,help:project_subcontracting.action_my_subcontracting_billable_timesheets
+#: model_terms:ir.actions.act_window,help:project_subcontracting.action_subcontracting_billable_timesheets
+msgid "No hours to bill"
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_analytic_line.py:0
+msgid ""
+"No vendor bill was created:\n"
+"%s"
+msgstr ""
+
+#. module: project_subcontracting
+#: model_terms:ir.ui.view,arch_db:project_subcontracting.project_invoice_form
+msgid "Pay each assignee the hours they log, with a vendor bill"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_project_task__subcontracting_hour_cost
+msgid ""
+"Price of each hour of this task on the vendor bills that pay its "
+"subcontracted assignees. It is not the hourly cost of the employee."
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model,name:project_subcontracting.model_project_project
+msgid "Project"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.module.module,shortdesc:base.module_project_subcontracting
+msgid "Project Subcontracting"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:product.template,name:project_subcontracting.product_subcontracted_hours_product_template
+msgid "Subcontracted Hours"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.actions.act_window,name:project_subcontracting.action_subcontracting_billable_timesheets
+msgid "Subcontracted Hours to Bill"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_project_project__allow_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_project_task__allow_subcontracting
+msgid "Subcontracting"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_analytic_line__subcontracting_bill_id
+msgid "Subcontracting Bill"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_analytic_line__subcontracting_bill_line_id
+msgid "Subcontracting Bill Line"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_project_task__subcontracting_hour_cost
+msgid "Subcontracting Hour Cost"
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/project_project.py:0
+msgid "Subcontracting needs the timesheets of the project: %s"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model,name:project_subcontracting.model_project_task
+msgid "Task"
+msgstr ""
+
+#. module: project_subcontracting
+#: model_terms:ir.actions.act_window,help:project_subcontracting.action_subcontracting_billable_timesheets
+msgid ""
+"The hours that assignees log on done tasks of projects with Subcontracting appear here.\n"
+"                Select them and use Bill Hours to create a draft vendor bill for each collaborator."
+msgstr ""
+
+#. module: project_subcontracting
+#: model_terms:ir.actions.act_window,help:project_subcontracting.action_my_subcontracting_billable_timesheets
+msgid ""
+"The hours you log on done tasks of projects with Subcontracting appear here until\n"
+"                they are on a vendor bill."
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/project_task.py:0
+msgid ""
+"The subcontracting hour cost is 0: set it before billing the hours of this "
+"task."
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_project_project__allow_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_project_task__allow_subcontracting
+msgid ""
+"The tasks of this project are run by subcontracted implementers. Each task "
+"has a subcontracting hour cost; once done, the hours each assignee logged "
+"are paid to them with a vendor bill against the implementation provision."
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_analytic_line.py:0
+msgid ""
+"These timesheets are billed to their collaborator and cannot be changed or "
+"deleted; cancel the bill to release them: %s"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_analytic_line__subcontracting_billable
+#: model:ir.ui.menu,name:project_subcontracting.menu_subcontracting_to_bill
+msgid "To Bill"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_project_task__display_name
+msgid ""
+"Use these keywords in the title to set new tasks:\n"
+"\n"
+"        30h Allocate 30 hours to the task\n"
+"        #tags Set tags on the task\n"
+"        @user Assign the task to a user\n"
+"        ! Set the task a medium priority\n"
+"        !! Set the task a high priority\n"
+"        !!! Set the task a urgent priority\n"
+"\n"
+"        Make sure to use the right format and order e.g. Improve the configuration screen 5h #feature #v16 @Mitchell !"
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_analytic_line.py:0
+msgid "Vendor Bills"
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_analytic_line.py:0
+msgid "it is already billed on %s"
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_analytic_line.py:0
+msgid "it is not logged on a task"
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_analytic_line.py:0
+msgid "its project does not have Subcontracting"
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_analytic_line.py:0
+msgid "its task has no subcontracting hour cost"
+msgstr ""
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_analytic_line.py:0
+msgid "its task is not done"
+msgstr ""
