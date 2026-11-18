@@ -71,6 +71,21 @@ class TestProjectSubcontracting(AccountTestInvoicingCommon):
             ('partner_id', 'in', (self.carla | self.diego | self.eva).partner_id.ids),
         ])
 
+    def _provision(self, amount):
+        """ Provision ``amount`` of implementation in X, as a customer payment would (a bill needs it, R6). """
+        company = self.env.company
+        provision = self.env['account.account'].search([
+            ('provision_type', '=', 'implementation'), ('company_ids', 'in', company.id),
+        ], limit=1)
+        distribution = {self.analytic_x.id: 100}
+        self.env['account.move'].create({
+            'move_type': 'entry', 'journal_id': company.provision_journal_id.id, 'date': fields.Date.today(),
+            'line_ids': [
+                Command.create({'account_id': company.provision_implementation_expense_account_id.id, 'debit': amount, 'analytic_distribution': distribution}),
+                Command.create({'account_id': provision.id, 'credit': amount, 'analytic_distribution': distribution}),
+            ],
+        }).action_post()
+
     def _bill_hours(self, timesheets):
         timesheets.action_bill_subcontracted_hours()
         return timesheets.subcontracting_bill_line_id.move_id
@@ -181,6 +196,7 @@ class TestProjectSubcontracting(AccountTestInvoicingCommon):
         self.env['account.analytic.line'].create([
             {'name': "/", 'task_id': self.t2.id, 'project_id': self.project_x.id, 'employee_id': employee.id, 'unit_amount': 1.0}
         ] * 3)
+        self._provision(10000.0)
         timesheets = (self.h1 | self.h2).with_context(is_timesheet=1, search_default_groupby_employee=1)
         action = timesheets.action_bill_subcontracted_hours()
         bill = self.env['account.move'].with_context(action['context']).browse(action['res_id'])
@@ -194,6 +210,7 @@ class TestProjectSubcontracting(AccountTestInvoicingCommon):
         """ CA-50 (R5.4): cancelling Carla's bill and deleting Diego's leaves H1, H2, H8 and H3
         to bill again. """
         timesheets = self.h1 | self.h2 | self.h3 | self.h8
+        self._provision(10000.0)
         self._bill_hours(timesheets)
         bill_carla = self.h1.subcontracting_bill_id
         bill_carla.invoice_date = fields.Date.today()
