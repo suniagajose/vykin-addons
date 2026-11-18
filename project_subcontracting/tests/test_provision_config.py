@@ -5,6 +5,8 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.tests import tagged
 from odoo.tools import mute_logger
 
+from odoo.addons.project_subcontracting import _setup_companies
+
 from .common import ProvisionCommon
 
 
@@ -87,20 +89,61 @@ class TestProvisionConfig(ProvisionCommon):
                 self.assertEqual(commission_product.property_account_expense_id.code, '205.02.02')
                 self.assertEqual(hours_product.property_account_expense_id.code, '205.02.03')
 
-    def test_08_existing_account_is_reused(self):
-        existing = self.env['account.account'].with_company(self.company_b).create({
-            'code': '205.02.77', 'name': "Mi cuenta", 'account_type': 'liability_current',
-            'company_ids': [Command.set(self.company_b.ids)],
-        })
-        account = self.company_b._get_provision_account_by_code('205.02.77', "Otro nombre", 'liability_current', 'commission')
-        self.assertEqual(account, existing)
-        self.assertEqual((account.name, account.provision_type), ("Mi cuenta", 'commission'))
+    def test_08_install_reuses_existing_accounts(self):
+        """ CA-08 (R1.4): the install hook reuses 601.74.01 and 205.02.02 when a company already has them,
+        keeping their name and giving the provision its type, and creates what is missing. """
+        company = self.env['res.company'].create({'name': "Compañía C", 'chart_template': self.company_a.chart_template})
+        self.env.user.company_ids |= company
+        Account = self.env['account.account'].with_company(company)
+        expense, provision = Account.create([
+            {'code': code, 'name': name, 'account_type': account_type, 'company_ids': [Command.set(company.ids)]}
+            for code, name, account_type in (
+                ('601.74.01', "Comisiones pagadas", 'expense'),
+                ('205.02.02', "Acreedores por comisiones", 'liability_current'),
+            )
+        ])
+        _setup_companies(self.env)
+        self.assertEqual(company.provision_commission_expense_account_id, expense)
+        self.assertEqual((expense.name, provision.name), ("Comisiones pagadas", "Acreedores por comisiones"))
+        self.assertEqual(provision.provision_type, 'commission')
+        commission_product = self.env.ref('project_subcontracting.product_commission').with_company(company)
+        self.assertEqual(commission_product.property_account_expense_id, provision)
+        implementation = Account.search([*Account._check_company_domain(company), ('code', '=', '205.02.03')])
+        self.assertEqual(implementation.provision_type, 'implementation')
+        self.assertEqual(company.provision_implementation_expense_account_id.with_company(company).code, '501.02.02')
+        self.assertTrue(company.provision_journal_id.restrict_mode_hash_table)
+        self.assertEqual((company.provision_commission_percent, company.provision_implementation_percent), (20.0, 75.0))
 
     def test_09_nothing_is_assigned_by_default(self):
-        for product in (self.env.ref('project_subcontracting.product_commission'),
-                        self.env.ref('project_subcontracting.product_subcontracted_hours')):
-            self.assertFalse(product.product_tmpl_id._has_provision_account())
-        self.assertFalse(self.env['product.category'].search([('name', '=', "All")]).property_provision_commission_categ_id)
+        """ CA-09 (R1.4): the install assigns no provision account, so a product of a category the
+        company did not configure has no share: no entry and no commission bill when it is paid. """
+        Category, Product = self.env['product.category'], self.env['product.template']
+        self.assertEqual(Category.search([
+            '|', ('property_provision_commission_categ_id', '!=', False),
+            ('property_provision_implementation_categ_id', '!=', False),
+        ]), self.categ_services | self.categ_licenses)
+        self.assertEqual(Product.search([
+            '|', ('property_provision_commission_id', '!=', False), ('property_provision_implementation_id', '!=', False),
+        ]), self.partners_advice | self.support)
+        product = self._create_provision_product("Asesoría", Category.create({'name': "Otros"}), 'no')
+        invoice = self._invoice(
+            [{'product': product, 'price': 1000.0, 'analytic': {self.analytic_x.id: 100}}],
+            salesperson=self.ana, post=True,
+        )
+        self.assertEqual(
+            (invoice.invoice_line_ids.provision_commission_percent, invoice.invoice_line_ids.provision_implementation_percent),
+            (0.0, 0.0),
+        )
+        self._pay(invoice, None, '2026-11-10')
+        self.assertFalse(self._provision_entries())
+        self.assertFalse(self._commission_bills())
+
+    def test_settings_of_another_company(self):
+        """ The provision journal and expense accounts belong to the company or to its parent. """
+        with self.assertRaises(ValidationError):
+            self.company_b.provision_journal_id = self.company_a.provision_journal_id
+        with self.assertRaises(ValidationError):
+            self.company_b.provision_commission_expense_account_id = self.company_a.provision_commission_expense_account_id
 
     # R1.5: a product with a provision generates its project from a template with Subcontracting
 

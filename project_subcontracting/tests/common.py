@@ -184,8 +184,8 @@ class ProvisionCase(ProvisionCommon):
         cls.f1_x, cls.f1_y, _f1_equipment = cls.f1.invoice_line_ids
 
     def _e1(self):
-        """ State E1: F1 posted and half paid by P1 (REP-1 and the draft bill FP-COM-1). """
-        self._pay(self.f1, 7540.0, '2026-11-10')
+        """ State E1: F1 posted and half paid by P1 (REP-1 and the draft bill FP-COM-1). Return P1. """
+        return self._pay(self.f1, 7540.0, '2026-11-10')
 
     def _credit_note(self, lines, date='2026-11-12', origin=None, taxed=True):
         return self._invoice(

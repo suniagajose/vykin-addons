@@ -27,7 +27,7 @@ class AccountMoveLine(models.Model):
     # Tags the journal items of the provision entries. It is copied, so that the reversal of an entry
     # carries the same tag with the opposite amount.
     provision_origin_line_id = fields.Many2one(
-        'account.move.line', string="Provisioned Line", readonly=True, index='btree_not_null', ondelete='restrict',
+        'account.move.line', string="Provisioned Line", readonly=True, index='btree_not_null', ondelete='set null',
         help="The invoice or credit note line this provision item comes from.",
     )
 
