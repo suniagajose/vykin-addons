@@ -1,4 +1,5 @@
 from odoo import Command
+from odoo.exceptions import UserError
 from odoo.tests import tagged
 
 from .common import ProvisionCase
@@ -283,6 +284,78 @@ class TestProvisionReconcile(ProvisionCase):
         self._e1()
         self.assertFalse(self._commission_bills())
         self.assertTrue(self._unprovisioned_note(self.f1))
+
+    def test_37_paid_in_draft_then_posted(self):
+        """ CA-97 (R3.7): an invoice paid with the Pay button while in draft is provisioned when posted, as
+        if it had been paid then, with the date of the reconciliation. """
+        invoice = self._invoice([self.line_x, self.line_y, self.line_equipment], salesperson=self.ana, taxed=True)
+        self._pay(invoice, 7540.0, '2026-11-10')
+        self.assertFalse(self._provision_entries())
+        invoice.action_post()
+        entry = self._provision_entries()
+        self.assertEqual(len(entry), 1)
+        self.assertEqual(str(entry.date), '2026-11-10')
+        self.assertEqual(sorted(entry.line_ids.mapped('debit')), [0.0, 0.0, 0.0, 200.0, 1000.0, 3750.0])
+        bill = self._commission_bills()
+        self.assertEqual(sorted(bill.invoice_line_ids.mapped('price_unit')), [200.0, 1000.0])
+        # Posting again does not provision again.
+        self.assertEqual(len(self._provision_entries()), 1)
+
+    def _credits_of_provisions(self, entry):
+        return sorted(
+            (item.account_id.provision_type, item.credit) for item in entry.line_ids if item.account_id.provision_type
+        )
+
+    def test_38_commission_left_in_income_stays_there(self):
+        """ CA-98 (R3.3, R3.6): the collection that settles the invoice settles only the cents: the commission
+        of an earlier collection without salesperson stays in income. """
+        self.f1.invoice_user_id = False
+        self._e1()
+        self.assertEqual(self._credits_of_provisions(self._provision_entries()), [('implementation', 3750.0)])
+        self.f1.invoice_user_id = self.ana
+        self._pay(self.f1, 7540.0, '2026-11-20')
+        settling = self._provision_entries()[-1]
+        self.assertEqual(
+            self._credits_of_provisions(settling),
+            [('commission', 200.0), ('commission', 1000.0), ('implementation', 3750.0)],
+        )
+        self.assertEqual(sorted(self._commission_bills().invoice_line_ids.mapped('price_unit')), [200.0, 1000.0])
+
+    def test_38_salesperson_removed_before_the_last_collection(self):
+        """ R3.6: the note of the settling collection counts only its own commission. """
+        self._e1()
+        self.f1.invoice_user_id = False
+        self._pay(self.f1, 7540.0, '2026-11-20')
+        self.assertEqual(self._credits_of_provisions(self._provision_entries()[-1]), [('implementation', 3750.0)])
+        note = self._unprovisioned_note(self.f1)
+        self.assertEqual(len(note), 1)
+        self.assertIn("1,200.00", note.body)
+
+    def test_40_second_analytic_plan(self):
+        """ CA-99 (R4.1, R6.3): the provisions are controlled by the analytic account of the project plan; the
+        accounts of another plan stay on the items but do not count a second time. """
+        plan = self.env['account.analytic.plan'].create({'name': "Departamentos"})
+        department = self.env['account.analytic.account'].create({'name': "Ventas", 'plan_id': plan.id})
+        distribution = {f"{self.analytic_x.id},{department.id}": 100}
+        invoice = self._invoice(
+            [{'product': self.consulting, 'price': 5000.0, 'analytic': distribution}],
+            salesperson=self.ana, post=True, taxed=True,
+        )
+        self._pay(invoice, None, '2026-11-10')
+        entry = self._provision_entries()
+        self.assertEqual({tuple(item.analytic_distribution) for item in entry.line_ids}, {tuple(distribution)})
+        bill = self._commission_bills()
+        self.assertEqual(
+            [(line.analytic_distribution, line.price_unit) for line in bill.invoice_line_ids],
+            [({str(self.analytic_x.id): 100.0}, 1000.0)],
+        )
+        # A line against the provision with only the account of another plan does not escape the control.
+        with self.assertRaises(UserError):
+            self._bill(self.ana.partner_id, [(self.commission_provision, 100.0, {department.id: 100})], post=True)
+        # The provision of 1,000.00 is consumed once: a second bill for the same account is rejected.
+        self._bill(self.ana.partner_id, [(self.commission_provision, 1000.0, distribution)], post=True)
+        with self.assertRaises(UserError):
+            self._bill(self.ana.partner_id, [(self.commission_provision, 1.0, distribution)], post=True)
 
     def test_39_implementation_only(self):
         invoice = self._invoice(

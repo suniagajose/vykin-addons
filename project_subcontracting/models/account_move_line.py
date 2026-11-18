@@ -62,12 +62,21 @@ class AccountMoveLine(models.Model):
         return values
 
     def _get_provision_analytic_shares(self):
-        """ Yield (analytic account id, percentage) of this line: a line distributed on several analytic
-        accounts counts in each one for its percentage. """
+        """ Yield (analytic account id, percentage) of this line in the project plan: a line distributed on
+        several analytic accounts counts in each one for its percentage. The accounts of other plans are
+        another dimension of the same amount: they stay on the items for the reports, but they do not
+        count in the control of the provisions, or the same amount would count once per plan. """
         self.ensure_one()
+        project_plan, _other_plans = self.env['account.analytic.plan']._get_all_plans()
         for key, percentage in (self.analytic_distribution or {}).items():
-            for analytic_id in key.split(','):
-                yield int(analytic_id), percentage
+            for analytic in self.env['account.analytic.account'].browse(int(analytic_id) for analytic_id in key.split(',')):
+                if analytic.root_plan_id == project_plan:
+                    yield analytic.id, percentage
+
+    def _has_provision_analytic(self):
+        """ Whether this line has an analytic account of the project plan, which controls the provisions. """
+        self.ensure_one()
+        return next(self._get_provision_analytic_shares(), None) is not None
 
     def _get_provision_balances(self, accounts, analytic_ids):
         """ Return {(account, analytic account id, partner): credit balance} of the posted items on these
