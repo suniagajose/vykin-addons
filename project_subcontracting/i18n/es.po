@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 16:27+0000\n"
+"POT-Creation-Date: 2026-11-18 17:48+0000\n"
 "PO-Revision-Date: 2026-11-17 23:45+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -22,27 +22,88 @@ msgid ""
 "\n"
 "Project Subcontracting\n"
 "======================\n"
-"Projects marked as *Subcontracting* run their tasks with subcontracted "
-"implementers.\n"
-"*Subcontracting* is an option of *Timesheets*: it only shows with them and "
-"is turned off\n"
-"with them.\n"
+"Splits what each customer payment of an implementation sale brings in between the salesperson,\n"
+"the implementers and the company, and pays them with vendor bills, never more than what was\n"
+"provisioned and never before the customer pays.\n"
 "\n"
+"* Provision accounts are chosen on the product or its product category, like the expense\n"
+"  account, and a product with one generates its project from a template with *Subcontracting*.\n"
+"  The company sets the percentages (standard: 20% commission, 75% implementation; the company\n"
+"  keeps the rest as income), the expense accounts and the journal.\n"
+"* A posted customer invoice keeps the percentages and provision accounts of each line. Each\n"
+"  reconciliation posts a provision entry for the share it covers, with the analytic account of\n"
+"  the line, and creates a draft vendor bill for the commission of the salesperson.\n"
+"  Unreconciling reverses them.\n"
+"* A vendor bill against a provision cannot exceed its balance in the analytic account.\n"
+"* Projects marked as *Subcontracting* run their tasks with subcontracted implementers.\n"
+"  *Subcontracting* is an option of *Timesheets*: it only shows with them and is turned off\n"
+"  with them.\n"
 "* Each task of these projects has a subcontracting hour cost.\n"
-"* The hours an assignee logs on a done task are *to bill*. *Bill Hours*, on "
-"the chosen\n"
-"  timesheets, creates one draft vendor bill per collaborator, with a "
-"*Subcontracted Hours*\n"
-"  line per task: the hours, the task's hour cost and the project's analytic "
-"account.\n"
-"* Each timesheet is linked to its bill line and cannot be changed or deleted "
-"while the\n"
+"* The hours an assignee logs on a done task are *to bill*. *Bill Hours*, on the chosen\n"
+"  timesheets, creates one draft vendor bill per collaborator, with a *Subcontracted Hours*\n"
+"  line per task: the hours, the task's hour cost and the project's analytic account.\n"
+"* Each timesheet is linked to its bill line and cannot be changed or deleted while the\n"
 "  bill is not cancelled.\n"
-"* The task warns about what departs from that flow: an hour cost of 0, hours "
-"logged by\n"
-"  someone not assigned, hours to bill on a done task, and hours over the "
-"planned ones.\n"
+"* The task warns about what departs from that flow: an hour cost of 0, hours logged by\n"
+"  someone not assigned, hours to bill on a done task, and hours over the planned ones.\n"
 msgstr ""
+"\n"
+"Project Subcontracting\n"
+"======================\n"
+"Reparte lo que trae cada cobro de una venta de implementación entre el vendedor, los\n"
+"implementadores y la compañía, y les paga con facturas de proveedor, nunca más de lo\n"
+"provisionado ni antes de que pague el cliente.\n"
+"\n"
+"* Las cuentas de provisión se eligen en el producto o en su categoría, como la cuenta de\n"
+"  gasto, y un producto con cuenta de provisión genera su proyecto desde una plantilla con\n"
+"  *Subcontratación*. La compañía define los porcentajes (estándar: 20% de comisión, 75% de\n"
+"  implementación; la compañía conserva el resto como ingreso), las cuentas de gasto y el\n"
+"  diario.\n"
+"* Una factura de cliente publicada conserva los porcentajes y las cuentas de provisión de\n"
+"  cada línea. Cada conciliación registra un asiento de provisión por la parte que cubre, con\n"
+"  la cuenta analítica de la línea, y crea una factura de proveedor en borrador por la\n"
+"  comisión del vendedor. Desconciliar los revierte.\n"
+"* Una factura de proveedor contra una provisión no puede superar su saldo en la cuenta\n"
+"  analítica.\n"
+"* Los proyectos marcados como *Subcontratación* ejecutan sus tareas con implementadores\n"
+"  subcontratados. *Subcontratación* es una opción de *Hojas de horas*: solo aparece con\n"
+"  ellas y se desactiva con ellas.\n"
+"* Cada tarea de estos proyectos tiene un costo de subcontratación por hora.\n"
+"* Las horas que un asignado registra en una tarea terminada quedan *por facturar*.\n"
+"  *Facturar horas*, sobre las hojas de horas elegidas, crea una factura de proveedor en\n"
+"  borrador por colaborador, con una línea de *Horas subcontratadas* por tarea: las horas, el\n"
+"  costo por hora de la tarea y la cuenta analítica del proyecto.\n"
+"* Cada hoja de horas queda ligada a su línea de factura y no se puede cambiar ni borrar\n"
+"  mientras la factura no esté cancelada.\n"
+"* La tarea avisa de lo que se aparta de ese flujo: un costo por hora de 0, horas registradas\n"
+"  por alguien que no está asignado, horas por facturar en una tarea terminada y horas por\n"
+"  encima de las planeadas.\n"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_move.py:0
+msgid ""
+"%(account)s in %(analytic)s%(partner)s: %(amount)s against a balance of "
+"%(balance)s"
+msgstr ""
+"%(account)s en %(analytic)s%(partner)s: %(amount)s contra un saldo de "
+"%(balance)s"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
+msgid "%(bill)s (%(vendor)s, %(state)s, %(paid)s)"
+msgstr "%(bill)s (%(vendor)s, %(state)s, %(paid)s)"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
+msgid ""
+"%(entity)s in %(analytic)s would be left with %(balance)s. Its commission "
+"bills: %(bills)s"
+msgstr ""
+"%(entity)s en %(analytic)s quedaría con %(balance)s. Sus facturas de "
+"comisión: %(bills)s"
 
 #. module: project_subcontracting
 #. odoo-python
@@ -53,8 +114,18 @@ msgid ""
 "Adjust the planned hours or decide whether to pay them."
 msgstr ""
 "Se registraron %(logged)s horas y se planearon %(planned)s: las horas de más "
-"se facturan al costo de la tarea y consumen provisión de otras tareas. "
-"Ajuste las horas planeadas o decida si se pagan."
+"se facturan al costo de la tarea y consumen provisión de otras tareas. Ajuste"
+" las horas planeadas o decida si se pagan."
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/sale_order.py:0
+msgid ""
+"%(order)s sends %(products)s to the project %(project)s, which does not have "
+"Subcontracting."
+msgstr ""
+"%(order)s envía %(products)s al proyecto %(project)s, que no tiene "
+"Subcontratación."
 
 #. module: project_subcontracting
 #. odoo-python
@@ -88,6 +159,62 @@ msgid "%s is not assigned to its task"
 msgstr "%s no está asignado a su tarea"
 
 #. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/product_template.py:0
+msgid ""
+"A product with a provision account must generate a project from a project "
+"template with Subcontracting. Fix: %s"
+msgstr ""
+"Un producto con cuenta de provisión debe generar su proyecto desde una "
+"plantilla de proyecto con Subcontratación. Corrija: %s"
+
+#. module: project_subcontracting
+#: model:ir.model,name:project_subcontracting.model_account_account
+msgid "Account"
+msgstr "Cuenta"
+
+#. module: project_subcontracting
+#: model:ir.model,name:project_subcontracting.model_account_chart_template
+msgid "Account Chart Template"
+msgstr "Plantilla del plan contable"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_commission_expense_account_id
+#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_commission_expense_account_id
+msgid "Account charged with the commission when it is provisioned."
+msgstr "Cuenta a la que se carga la comisión cuando se provisiona."
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_implementation_expense_account_id
+#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_implementation_expense_account_id
+msgid "Account charged with the implementation cost when it is provisioned."
+msgstr ""
+"Cuenta a la que se carga el costo de implementación cuando se provisiona."
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_account_move_line__provision_commission_account_id
+msgid ""
+"Account the commission of this line is provisioned in. Kept when the invoice "
+"is posted."
+msgstr ""
+"Cuenta en la que se provisiona la comisión de esta línea. Se conserva al "
+"publicar la factura."
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_account_move_line__provision_implementation_account_id
+msgid ""
+"Account the implementation work of this line is provisioned in. Kept when the"
+" invoice is posted."
+msgstr ""
+"Cuenta en la que se provisiona el trabajo de implementación de esta línea. Se"
+" conserva al publicar la factura."
+
+#. module: project_subcontracting
+#: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
+msgid "Accounting"
+msgstr "Contabilidad"
+
+#. module: project_subcontracting
 #: model:ir.ui.menu,name:project_subcontracting.menu_subcontracting_billable_timesheets
 msgid "All Subcontracted Hours"
 msgstr "Todas las horas subcontratadas"
@@ -103,38 +230,157 @@ msgid "Bill Hours"
 msgstr "Facturar horas"
 
 #. module: project_subcontracting
-#: model:ir.module.module,summary:base.module_project_subcontracting
-msgid "Bill the hours logged by subcontracted implementers on vendor bills"
-msgstr ""
-"Facturar en facturas de proveedor las horas registradas por implementadores "
-"subcontratados"
-
-#. module: project_subcontracting
 #. odoo-python
 #: code:addons/project_subcontracting/models/account_analytic_line.py:0
 msgid "Choose the timesheets to bill."
 msgstr "Elija los registros de horas que se facturarán."
 
 #. module: project_subcontracting
+#: model:ir.model.fields.selection,name:project_subcontracting.selection__account_account__provision_type__commission
+msgid "Commission"
+msgstr "Comisión"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_move_line__provision_commission_percent
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_company__provision_commission_percent
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_config_settings__provision_commission_percent
+msgid "Commission %"
+msgstr "% de comisión"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
+msgid "Commission Bills"
+msgstr "Facturas de comisión"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_company__provision_commission_expense_account_id
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_config_settings__provision_commission_expense_account_id
+msgid "Commission Expense"
+msgstr "Gasto de comisión"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_move_line__provision_commission_account_id
+#: model:ir.model.fields,field_description:project_subcontracting.field_product_category__property_provision_commission_categ_id
+#: model:ir.model.fields,field_description:project_subcontracting.field_product_product__property_provision_commission_id
+#: model:ir.model.fields,field_description:project_subcontracting.field_product_template__property_provision_commission_id
+msgid "Commission Provision"
+msgstr "Provisión de comisión"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
+msgid "Commission · %(counterpart)s · %(amount)s · %(invoice)s"
+msgstr "Comisión · %(counterpart)s · %(amount)s · %(invoice)s"
+
+#. module: project_subcontracting
+#: model:ir.model,name:project_subcontracting.model_res_company
+msgid "Company"
+msgstr "Compañía"
+
+#. module: project_subcontracting
+#: model:ir.model,name:project_subcontracting.model_res_config_settings
+msgid "Config Settings"
+msgstr "Ajustes de configuración"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_account__display_name
 #: model:ir.model.fields,field_description:project_subcontracting.field_account_analytic_line__display_name
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_chart_template__display_name
 #: model:ir.model.fields,field_description:project_subcontracting.field_account_move__display_name
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_partial_reconcile__display_name
+#: model:ir.model.fields,field_description:project_subcontracting.field_product_category__display_name
+#: model:ir.model.fields,field_description:project_subcontracting.field_product_template__display_name
 #: model:ir.model.fields,field_description:project_subcontracting.field_project_project__display_name
 #: model:ir.model.fields,field_description:project_subcontracting.field_project_task__display_name
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_company__display_name
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:project_subcontracting.field_sale_order__display_name
 msgid "Display Name"
 msgstr "Nombre para mostrar"
 
 #. module: project_subcontracting
+#: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
+msgid ""
+"Expense accounts the provisions are charged to, and the journal of the "
+"provision entries"
+msgstr ""
+"Cuentas de gasto a las que se cargan las provisiones y diario de los asientos"
+" de provisión"
+
+#. module: project_subcontracting
+#: model_terms:ir.ui.view,arch_db:project_subcontracting.product_template_form_view
+msgid "From Category"
+msgstr "De la categoría"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_account__id
 #: model:ir.model.fields,field_description:project_subcontracting.field_account_analytic_line__id
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_chart_template__id
 #: model:ir.model.fields,field_description:project_subcontracting.field_account_move__id
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_move_line__id
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_partial_reconcile__id
+#: model:ir.model.fields,field_description:project_subcontracting.field_product_category__id
+#: model:ir.model.fields,field_description:project_subcontracting.field_product_template__id
 #: model:ir.model.fields,field_description:project_subcontracting.field_project_project__id
 #: model:ir.model.fields,field_description:project_subcontracting.field_project_task__id
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_company__id
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_config_settings__id
+#: model:ir.model.fields,field_description:project_subcontracting.field_sale_order__id
 msgid "ID"
 msgstr "ID"
+
+#. module: project_subcontracting
+#: model:ir.model.fields.selection,name:project_subcontracting.selection__account_account__provision_type__implementation
+msgid "Implementation"
+msgstr "Implementación"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_move_line__provision_implementation_percent
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_company__provision_implementation_percent
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_config_settings__provision_implementation_percent
+msgid "Implementation %"
+msgstr "% de implementación"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_company__provision_implementation_expense_account_id
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_config_settings__provision_implementation_expense_account_id
+msgid "Implementation Cost"
+msgstr "Costo de implementación"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_move_line__provision_implementation_account_id
+#: model:ir.model.fields,field_description:project_subcontracting.field_product_category__property_provision_implementation_categ_id
+#: model:ir.model.fields,field_description:project_subcontracting.field_product_product__property_provision_implementation_id
+#: model:ir.model.fields,field_description:project_subcontracting.field_product_template__property_provision_implementation_id
+msgid "Implementation Provision"
+msgstr "Provisión de implementación"
 
 #. module: project_subcontracting
 #: model:ir.model,name:project_subcontracting.model_account_move
 msgid "Journal Entry"
 msgstr "Asiento contable"
+
+#. module: project_subcontracting
+#: model:ir.model,name:project_subcontracting.model_account_move_line
+msgid "Journal Item"
+msgstr "Apunte contable"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_journal_id
+#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_journal_id
+msgid "Journal of the provision entries."
+msgstr "Diario de los asientos de provisión."
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_product_product__property_provision_commission_id
+#: model:ir.model.fields,help:project_subcontracting.field_product_product__property_provision_implementation_id
+#: model:ir.model.fields,help:project_subcontracting.field_product_template__property_provision_commission_id
+#: model:ir.model.fields,help:project_subcontracting.field_product_template__property_provision_implementation_id
+msgid ""
+"Keep this field empty to use the default value from the product category."
+msgstr "Deje este campo vacío para usar el valor de la categoría del producto."
 
 #. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_account_analytic_line__subcontracting_billable
@@ -172,10 +418,26 @@ msgstr ""
 "%s"
 
 #. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
+msgid "Open the bills"
+msgstr "Abrir las facturas"
+
+#. module: project_subcontracting
+#: model:ir.model,name:project_subcontracting.model_account_partial_reconcile
+msgid "Partial Reconcile"
+msgstr "Conciliación parcial"
+
+#. module: project_subcontracting
 #: model_terms:ir.ui.view,arch_db:project_subcontracting.project_invoice_form
 msgid "Pay each assignee the hours they log, with a vendor bill"
 msgstr ""
 "Pagar a cada asignado las horas que registra, con una factura de proveedor"
+
+#. module: project_subcontracting
+#: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
+msgid "Payment Provision"
+msgstr "Provisión del cobro"
 
 #. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_project_task__subcontracting_hour_cost
@@ -187,6 +449,16 @@ msgstr ""
 "sus asignados subcontratados. No es el costo por hora del empleado."
 
 #. module: project_subcontracting
+#: model:ir.model,name:project_subcontracting.model_product_template
+msgid "Product"
+msgstr "Producto"
+
+#. module: project_subcontracting
+#: model:ir.model,name:project_subcontracting.model_product_category
+msgid "Product Category"
+msgstr "Categoría de producto"
+
+#. module: project_subcontracting
 #: model:ir.model,name:project_subcontracting.model_project_project
 msgid "Project"
 msgstr "Proyecto"
@@ -195,6 +467,112 @@ msgstr "Proyecto"
 #: model:ir.module.module,shortdesc:base.module_project_subcontracting
 msgid "Project Subcontracting"
 msgstr "Subcontratación de proyectos"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_company__provision_journal_id
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_config_settings__provision_journal_id
+msgid "Provision Journal"
+msgstr "Diario de provisiones"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_account__provision_type
+msgid "Provision Type"
+msgstr "Tipo de provisión"
+
+#. module: project_subcontracting
+#: model:ir.module.module,summary:base.module_project_subcontracting
+msgid ""
+"Provision the payment of each sale and pay subcontracted implementers with "
+"vendor bills"
+msgstr ""
+"Provisiona el cobro de cada venta y paga a los implementadores subcontratados"
+" con facturas de proveedor"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_bank_statement_line__provision_origin_move_id
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_move__provision_origin_move_id
+msgid "Provisioned Document"
+msgstr "Documento provisionado"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_move_line__provision_origin_line_id
+msgid "Provisioned Line"
+msgstr "Línea provisionada"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_bank_statement_line__provision_partial_id
+#: model:ir.model.fields,field_description:project_subcontracting.field_account_move__provision_partial_id
+msgid "Provisioned Reconciliation"
+msgstr "Conciliación provisionada"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
+msgid "Reversal of: %s"
+msgstr "Reversión de: %s"
+
+#. module: project_subcontracting
+#: model:product.template,name:project_subcontracting.product_commission_product_template
+msgid "Sales Commission"
+msgstr "Comisión de venta"
+
+#. module: project_subcontracting
+#: model:ir.model,name:project_subcontracting.model_sale_order
+msgid "Sales Order"
+msgstr "Pedido de venta"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
+msgid ""
+"Set the provision journal and the expense accounts of %s in the Accounting "
+"settings."
+msgstr ""
+"Configure el diario de provisiones y las cuentas de gasto de %s en los "
+"ajustes de Contabilidad."
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_account_move_line__provision_commission_percent
+msgid ""
+"Share of the subtotal of this line that provisions the commission of the "
+"salesperson when the invoice is paid. Kept when the invoice is posted."
+msgstr ""
+"Parte del subtotal de esta línea que provisiona la comisión del vendedor "
+"cuando se cobra la factura. Se conserva al publicar la factura."
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_account_move_line__provision_implementation_percent
+msgid ""
+"Share of the subtotal of this line that provisions the implementation work "
+"when the invoice is paid. Kept when the invoice is posted."
+msgstr ""
+"Parte del subtotal de esta línea que provisiona el trabajo de implementación "
+"cuando se cobra la factura. Se conserva al publicar la factura."
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_implementation_percent
+#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_implementation_percent
+msgid ""
+"Share of what each customer payment brings in that goes to the implementers. "
+"The company keeps the rest as income."
+msgstr ""
+"Parte de lo que trae cada cobro de un cliente que va a los implementadores. "
+"La compañía conserva el resto como ingreso."
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_commission_percent
+#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_commission_percent
+msgid ""
+"Share of what each customer payment brings in that goes to the salesperson of"
+" the invoice."
+msgstr ""
+"Parte de lo que trae cada cobro de un cliente que va al vendedor de la "
+"factura."
+
+#. module: project_subcontracting
+#: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
+msgid "Shares"
+msgstr "Porcentajes"
 
 #. module: project_subcontracting
 #: model:product.template,name:project_subcontracting.product_subcontracted_hours_product_template
@@ -239,12 +617,48 @@ msgid "Task"
 msgstr "Tarea"
 
 #. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/res_company.py:0
+msgid ""
+"The commission and implementation percentages of %s cannot be negative and "
+"cannot add up to more than 100."
+msgstr ""
+"Los porcentajes de comisión e implementación de %s no pueden ser negativos ni"
+" sumar más de 100."
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
+msgid ""
+"The commission was already billed, so this cannot be done:\n"
+"%(details)s\n"
+"\n"
+"To unblock it, in this order:\n"
+"1. If a bill is paid, break the reconciliation of its payment.\n"
+"2. Reset the bill to draft and cancel it.\n"
+"3. Repeat this operation."
+msgstr ""
+"La comisión ya se facturó, así que esto no se puede hacer:\n"
+"%(details)s\n"
+"\n"
+"Para desbloquearlo, en este orden:\n"
+"1. Si una factura está pagada, rompa la conciliación de su pago.\n"
+"2. Regrese la factura a borrador y cancélela.\n"
+"3. Repita esta operación."
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_account_bank_statement_line__provision_origin_move_id
+#: model:ir.model.fields,help:project_subcontracting.field_account_move__provision_origin_move_id
+msgid "The customer invoice or credit note this provision entry comes from."
+msgstr ""
+"La factura o nota de crédito de cliente de la que viene este asiento de "
+"provisión."
+
+#. module: project_subcontracting
 #: model_terms:ir.actions.act_window,help:project_subcontracting.action_subcontracting_billable_timesheets
 msgid ""
-"The hours that assignees log on done tasks of projects with Subcontracting "
-"appear here.\n"
-"                Select them and use Bill Hours to create a draft vendor bill "
-"for each collaborator."
+"The hours that assignees log on done tasks of projects with Subcontracting appear here.\n"
+"                Select them and use Bill Hours to create a draft vendor bill for each collaborator."
 msgstr ""
 "Aquí aparecen las horas que los asignados registran en tareas terminadas de "
 "proyectos con Subcontratación.                 Selecciónelas y use Facturar "
@@ -253,12 +667,37 @@ msgstr ""
 #. module: project_subcontracting
 #: model_terms:ir.actions.act_window,help:project_subcontracting.action_my_subcontracting_billable_timesheets
 msgid ""
-"The hours you log on done tasks of projects with Subcontracting appear here "
-"until\n"
+"The hours you log on done tasks of projects with Subcontracting appear here until\n"
 "                they are on a vendor bill."
 msgstr ""
 "Las horas que registra en tareas terminadas de proyectos con Subcontratación "
 "aparecen aquí hasta que estén en una factura de proveedor."
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_account_move_line__provision_origin_line_id
+msgid "The invoice or credit note line this provision item comes from."
+msgstr ""
+"La línea de la factura o nota de crédito de la que viene este apunte de "
+"provisión."
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_move.py:0
+msgid ""
+"The provision does not cover this bill:\n"
+"%s"
+msgstr ""
+"La provisión no cubre esta factura:\n"
+"%s"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_account_bank_statement_line__provision_partial_id
+#: model:ir.model.fields,help:project_subcontracting.field_account_move__provision_partial_id
+msgid ""
+"The reconciliation that created this provision entry or commission bill."
+msgstr ""
+"La conciliación que creó este asiento de provisión o esta factura de "
+"comisión."
 
 #. module: project_subcontracting
 #. odoo-python
@@ -275,13 +714,52 @@ msgstr ""
 #: model:ir.model.fields,help:project_subcontracting.field_project_task__allow_subcontracting
 msgid ""
 "The tasks of this project are run by subcontracted implementers. Each task "
-"has a subcontracting hour cost; once done, the hours each assignee logged "
-"are paid to them with a vendor bill against the implementation provision."
+"has a subcontracting hour cost; once done, the hours each assignee logged are"
+" paid to them with a vendor bill against the implementation provision."
 msgstr ""
 "Las tareas de este proyecto se ejecutan con implementadores subcontratados. "
 "Cada tarea lleva un costo de subcontratación por hora; al terminarse, las "
 "horas que registró cada asignado se le pagan con una factura de proveedor "
 "contra la provisión de implementación."
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_move.py:0
+msgid ""
+"These lines are against a provision, so they need an analytic account: %s"
+msgstr ""
+"Estas líneas son contra una provisión, así que necesitan una cuenta "
+"analítica: %s"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_move.py:0
+msgid ""
+"These lines are provisioned for the commission or the implementation, so they"
+" need an analytic account: %s"
+msgstr ""
+"Estas líneas se provisionan para la comisión o la implementación, así que "
+"necesitan una cuenta analítica: %s"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_move.py:0
+msgid ""
+"These lines are provisioned for the commission, so the document needs a "
+"salesperson: %s"
+msgstr ""
+"Estas líneas se provisionan para la comisión, así que el documento necesita "
+"un vendedor: %s"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/project_project.py:0
+msgid ""
+"These products have a provision account and need their project template to "
+"stay active with Subcontracting: %s"
+msgstr ""
+"Estos productos tienen cuenta de provisión y necesitan que su plantilla de "
+"proyecto siga activa con Subcontratación: %s"
 
 #. module: project_subcontracting
 #. odoo-python
@@ -311,8 +789,7 @@ msgid ""
 "        !! Set the task a high priority\n"
 "        !!! Set the task a urgent priority\n"
 "\n"
-"        Make sure to use the right format and order e.g. Improve the "
-"configuration screen 5h #feature #v16 @Mitchell !"
+"        Make sure to use the right format and order e.g. Improve the configuration screen 5h #feature #v16 @Mitchell !"
 msgstr ""
 "Utiliza estas palabras clave en el título para establecer nuevas tareas:\n"
 "\n"
@@ -323,14 +800,55 @@ msgstr ""
 "        !! Asignar prioridad alta a la tarea\n"
 "        !!! Asignar prioridad urgente a la tarea\n"
 "\n"
-"        Asegúrate de utilizar el formato y el orden correcto, por ejemplo: "
-"¡Mejorar la pantalla de configuración 5 h #función #v16 @Mitchell!"
+"        Asegúrate de utilizar el formato y el orden correcto, por ejemplo: ¡Mejorar la pantalla de configuración 5 h #función #v16 @Mitchell!"
 
 #. module: project_subcontracting
 #. odoo-python
 #: code:addons/project_subcontracting/models/account_analytic_line.py:0
 msgid "Vendor Bills"
 msgstr "Facturas de proveedor"
+
+#. module: project_subcontracting
+#: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
+msgid ""
+"What each customer payment of a product with a provision account sets aside; "
+"the company keeps the rest as income"
+msgstr ""
+"Lo que aparta cada cobro de un producto con cuenta de provisión; la compañía "
+"conserva el resto como ingreso"
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_account_account__provision_type
+msgid ""
+"What the balance of this account provisions: the commission of the "
+"salespeople or the implementation work. Products and product categories only "
+"offer the accounts of their type."
+msgstr ""
+"Qué provisiona el saldo de esta cuenta: la comisión de los vendedores o el "
+"trabajo de implementación. Los productos y las categorías de producto solo "
+"ofrecen las cuentas de su tipo."
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_product_category__property_provision_commission_categ_id
+msgid ""
+"Where the commission of the sales of these products is provisioned when the "
+"customer pays. Empty, the one of the parent category; with none, the "
+"commission is not provisioned."
+msgstr ""
+"Donde se provisiona la comisión de las ventas de estos productos cuando el "
+"cliente paga. Vacía, la de la categoría superior; sin ninguna, la comisión no"
+" se provisiona."
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_product_category__property_provision_implementation_categ_id
+msgid ""
+"Where the implementation work of the sales of these products is provisioned "
+"when the customer pays. Empty, the one of the parent category; with none, it "
+"is not provisioned."
+msgstr ""
+"Donde se provisiona el trabajo de implementación de las ventas de estos "
+"productos cuando el cliente paga. Vacía, la de la categoría superior; sin "
+"ninguna, no se provisiona."
 
 #. module: project_subcontracting
 #. odoo-python
@@ -361,3 +879,21 @@ msgstr "su tarea no tiene costo de subcontratación por hora"
 #: code:addons/project_subcontracting/models/account_analytic_line.py:0
 msgid "its task is not done"
 msgstr "su tarea no está terminada"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
+msgid "none"
+msgstr "ninguna"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
+msgid "not paid"
+msgstr "no pagada"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_partial_reconcile.py:0
+msgid "paid"
+msgstr "pagada"
