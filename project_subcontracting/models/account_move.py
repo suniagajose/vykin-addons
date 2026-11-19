@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from odoo import fields, models
 from odoo.exceptions import UserError
-from odoo.tools import format_amount
+from odoo.tools import float_compare, format_amount
 
 
 class AccountMove(models.Model):
@@ -19,6 +19,12 @@ class AccountMove(models.Model):
         'account.move', string="Provisioned Document", readonly=True, copy=False, index='btree_not_null',
         help="The customer invoice or credit note this provision entry comes from.",
     )
+
+    def write(self, vals):
+        # Only the module links a move to the reconciliation and the document it provisions, when it creates it.
+        if 'provision_partial_id' in vals or 'provision_origin_move_id' in vals:
+            raise UserError(self.env._("The provision of a journal entry cannot be changed."))
+        return super().write(vals)
 
     def _get_subcontracting_bill_label(self):
         """ Name of this bill in the messages about billed timesheets: a draft bill has no
@@ -60,10 +66,14 @@ class AccountMove(models.Model):
         lines = self.invoice_line_ids.filtered(lambda line: line.display_type == 'product' and line.account_id.provision_type)
         if not lines:
             return
-        if no_analytic := lines.filtered(lambda line: not line._has_provision_analytic()):
+        # The whole line must be in the project plan: what is not would consume the provision unchecked.
+        if not_distributed := lines.filtered(lambda line: float_compare(
+            sum(percentage for _analytic_id, percentage in line._get_provision_analytic_shares()), 100.0, precision_digits=2,
+        )):
             raise UserError(self.env._(
-                "These lines are against a provision, so they need an analytic account of the project plan: %s",
-                [line.name or line.account_id.display_name for line in no_analytic],
+                "These lines are against a provision, so they need to be distributed in full on analytic "
+                "accounts of the project plan: %s",
+                [line.name or line.account_id.display_name for line in not_distributed],
             ))
         no_partner = self.env['res.partner']
         amounts = defaultdict(float)

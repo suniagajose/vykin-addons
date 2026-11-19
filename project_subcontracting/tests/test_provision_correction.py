@@ -158,6 +158,9 @@ class TestProvisionCorrection(ProvisionCase):
         self.assertEqual(len(items), 2)
         self.assertFalse(items.provision_origin_line_id)
         self.assertEqual(self._balance(self.commission_provision, self.analytic_y), 0.0)
+        # Without the link to the line, they are still provision items: their analytic cannot move.
+        with self.assertRaises(UserError):
+            items.write({'analytic_distribution': {str(self.analytic_x.id): 100.0}})
 
     def test_70_entry_cannot_go_back_to_draft(self):
         self._e1()
@@ -171,6 +174,19 @@ class TestProvisionCorrection(ProvisionCase):
         with self.assertRaises(UserError):
             item.analytic_distribution = {str(self.analytic_y.id): 100.0}
         self.assertEqual(self._balance(self.commission_provision, self.analytic_x), 1000.0)
+
+    def test_provision_of_a_posted_document_cannot_be_changed(self):
+        """ The percentages and accounts of a posted line, and the links of an entry, are not covered by
+        the hash, and the next payment provisions what they say. """
+        self._e1()
+        line = self.f1_x
+        for record, vals in (
+            (line, {'provision_commission_percent': 90.0}),
+            (line, {'provision_implementation_account_id': self.other_liability.id}),
+            (self._provision_entries(), {'provision_origin_move_id': self.f1.id}),
+        ):
+            with self.subTest(vals=vals), self.assertRaises(UserError), self.cr.savepoint():
+                record.write(vals)
 
     def test_71_entry_cannot_be_changed(self):
         self._e1()

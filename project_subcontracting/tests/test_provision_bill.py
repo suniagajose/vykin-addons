@@ -76,6 +76,12 @@ class TestProvisionBill(ProvisionCase):
         bill = self._bill(self.carla, [(self.commission_expense, 100.0, False)], post=True)
         self.assertEqual(bill.state, 'posted')
 
+    def test_line_partly_distributed_in_the_project_plan(self):
+        """ Only the whole line can be checked against a balance, so the rest cannot be left undistributed. """
+        self._e1()
+        with self.assertRaises(UserError):
+            self._bill(self.carla, [(self.implementation_provision, 100000.0, {self.analytic_x.id: 1})], post=True)
+
     def test_credit_note_of_a_vendor_gives_the_provision_back(self):
         refund = self._bill(self.carla, [(self.implementation_provision, 100.0, self._x())], move_type='in_refund', post=True)
         self.assertEqual(refund.state, 'posted')

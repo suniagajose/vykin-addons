@@ -4,6 +4,12 @@ from odoo import fields, models
 from odoo.exceptions import UserError
 
 
+PROVISION_FIELDS = frozenset((
+    'provision_commission_percent', 'provision_implementation_percent',
+    'provision_commission_account_id', 'provision_implementation_account_id', 'provision_origin_line_id',
+))
+
+
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
@@ -33,10 +39,16 @@ class AccountMoveLine(models.Model):
     )
 
     def write(self, vals):
-        # The hash of the journal covers the amounts and accounts of an item, not its analytic distribution,
-        # which the balances of the provision (R6) read: it cannot move a provision to another project.
-        if 'analytic_distribution' in vals and self.filtered(
-            lambda line: line.provision_origin_line_id and line.parent_state == 'posted',
+        posted = self.filtered(lambda line: line.parent_state == 'posted')
+        # The hash of the journal covers the amounts and accounts of an item, not these fields, which the
+        # provisions read: only the module sets them, when the invoice is posted or the entry is created.
+        if posted and not PROVISION_FIELDS.isdisjoint(vals):
+            raise UserError(self.env._("The provision of a posted journal item cannot be changed."))
+        # Nor its analytic distribution, which the balances of the provision (R6) read: it cannot move a
+        # provision to another project. The journal tells the items apart, as a reversal or a deleted
+        # invoice line leaves no link to the line they come from.
+        if 'analytic_distribution' in vals and posted.filtered(
+            lambda line: line.journal_id == line.company_id.provision_journal_id,
         ):
             raise UserError(self.env._("The analytic distribution of a posted provision entry cannot be changed."))
         return super().write(vals)
