@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 23:52+0000\n"
-"PO-Revision-Date: 2026-11-18 23:52+0000\n"
+"POT-Creation-Date: 2026-11-19 02:44+0000\n"
+"PO-Revision-Date: 2026-11-19 02:44+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -118,18 +118,6 @@ msgid "Account Chart Template"
 msgstr ""
 
 #. module: project_subcontracting
-#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_commission_expense_account_id
-#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_commission_expense_account_id
-msgid "Account charged with the commission when it is provisioned."
-msgstr ""
-
-#. module: project_subcontracting
-#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_implementation_expense_account_id
-#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_implementation_expense_account_id
-msgid "Account charged with the implementation cost when it is provisioned."
-msgstr ""
-
-#. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_account_move_line__provision_commission_account_id
 msgid ""
 "Account the commission of this line is provisioned in. Kept when the invoice"
@@ -229,10 +217,26 @@ msgid "Display Name"
 msgstr ""
 
 #. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_commission_expense_account_id
+#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_commission_expense_account_id
+msgid ""
+"Expense account charged with the commission when it is provisioned. Its "
+"counterpart is the commission provision account of the product."
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_implementation_expense_account_id
+#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_implementation_expense_account_id
+msgid ""
+"Expense account charged with the implementation cost when it is provisioned."
+" Its counterpart is the implementation provision account of the product."
+msgstr ""
+
+#. module: project_subcontracting
 #: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
 msgid ""
-"Expense accounts the provisions are charged to, and the journal of the "
-"provision entries"
+"Expense accounts and journal of the subcontracting provision entries. The "
+"provision account (a liability) is set on the product or its category."
 msgstr ""
 
 #. module: project_subcontracting
@@ -296,7 +300,8 @@ msgstr ""
 #. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_journal_id
 #: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_journal_id
-msgid "Journal of the provision entries."
+msgid ""
+"Journal of the provision entries. It must lock posted entries with a hash."
 msgstr ""
 
 #. module: project_subcontracting
@@ -350,11 +355,6 @@ msgid "Pay each assignee the hours they log, with a vendor bill"
 msgstr ""
 
 #. module: project_subcontracting
-#: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
-msgid "Payment Provision"
-msgstr ""
-
-#. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_project_task__subcontracting_hour_cost
 msgid ""
 "Price of each hour of this task on the vendor bills that pay its "
@@ -379,12 +379,6 @@ msgstr ""
 #. module: project_subcontracting
 #: model:ir.module.module,shortdesc:base.module_project_subcontracting
 msgid "Project Subcontracting"
-msgstr ""
-
-#. module: project_subcontracting
-#: model:ir.model.fields,field_description:project_subcontracting.field_res_company__provision_journal_id
-#: model:ir.model.fields,field_description:project_subcontracting.field_res_config_settings__provision_journal_id
-msgid "Provision Journal"
 msgstr ""
 
 #. module: project_subcontracting
@@ -441,6 +435,24 @@ msgid ""
 msgstr ""
 
 #. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_commission_percent
+#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_commission_percent
+msgid ""
+"Share of each customer payment provisioned for the salesperson of the "
+"invoice. They are paid with a draft vendor bill created when the payment is "
+"reconciled."
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_implementation_percent
+#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_implementation_percent
+msgid ""
+"Share of each customer payment provisioned on the analytic account of the "
+"project to pay the hours of the subcontracted implementers. Those hours are "
+"billed from Timesheets > To Bill."
+msgstr ""
+
+#. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_account_move_line__provision_commission_percent
 msgid ""
 "Share of the subtotal of this line that provisions the commission of the "
@@ -452,22 +464,6 @@ msgstr ""
 msgid ""
 "Share of the subtotal of this line that provisions the implementation work "
 "when the invoice is paid. Kept when the invoice is posted."
-msgstr ""
-
-#. module: project_subcontracting
-#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_implementation_percent
-#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_implementation_percent
-msgid ""
-"Share of what each customer payment brings in that goes to the implementers."
-" The company keeps the rest as income."
-msgstr ""
-
-#. module: project_subcontracting
-#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_commission_percent
-#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_commission_percent
-msgid ""
-"Share of what each customer payment brings in that goes to the salesperson "
-"of the invoice."
 msgstr ""
 
 #. module: project_subcontracting
@@ -488,6 +484,7 @@ msgstr ""
 #. module: project_subcontracting
 #: model:ir.model.fields,field_description:project_subcontracting.field_project_project__allow_subcontracting
 #: model:ir.model.fields,field_description:project_subcontracting.field_project_task__allow_subcontracting
+#: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
 msgid "Subcontracting"
 msgstr ""
 
@@ -504,6 +501,12 @@ msgstr ""
 #. module: project_subcontracting
 #: model:ir.model.fields,field_description:project_subcontracting.field_project_task__subcontracting_hour_cost
 msgid "Subcontracting Hour Cost"
+msgstr ""
+
+#. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_company__provision_journal_id
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_config_settings__provision_journal_id
+msgid "Subcontracting Journal"
 msgstr ""
 
 #. module: project_subcontracting
@@ -683,18 +686,19 @@ msgid "Vendor Bills"
 msgstr ""
 
 #. module: project_subcontracting
-#: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
-msgid ""
-"What each customer payment of a product with a provision account sets aside;"
-" the company keeps the rest as income"
-msgstr ""
-
-#. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_account_account__provision_type
 msgid ""
 "What the balance of this account provisions: the commission of the "
 "salespeople or the implementation work. Products and product categories only"
 " offer the accounts of their type."
+msgstr ""
+
+#. module: project_subcontracting
+#: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
+msgid ""
+"When a customer payment of a product with a provision account is reconciled,"
+" subcontracting sets aside these shares of what was collected (without "
+"taxes). The rest is income of the company."
 msgstr ""
 
 #. module: project_subcontracting

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 20:03+0000\n"
+"POT-Creation-Date: 2026-11-19 02:44+0000\n"
 "PO-Revision-Date: 2026-11-17 23:45+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -163,19 +163,6 @@ msgid "Account Chart Template"
 msgstr "Plantilla del plan contable"
 
 #. module: project_subcontracting
-#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_commission_expense_account_id
-#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_commission_expense_account_id
-msgid "Account charged with the commission when it is provisioned."
-msgstr "Cuenta a la que se carga la comisión cuando se provisiona."
-
-#. module: project_subcontracting
-#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_implementation_expense_account_id
-#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_implementation_expense_account_id
-msgid "Account charged with the implementation cost when it is provisioned."
-msgstr ""
-"Cuenta a la que se carga el costo de implementación cuando se provisiona."
-
-#. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_account_move_line__provision_commission_account_id
 msgid ""
 "Account the commission of this line is provisioned in. Kept when the invoice "
@@ -279,13 +266,35 @@ msgid "Display Name"
 msgstr "Nombre para mostrar"
 
 #. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_commission_expense_account_id
+#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_commission_expense_account_id
+msgid ""
+"Expense account charged with the commission when it is provisioned. Its "
+"counterpart is the commission provision account of the product."
+msgstr ""
+"Cuenta de gasto a la que se carga la comisión cuando se provisiona. Su "
+"contrapartida es la cuenta de provisión de comisión del producto."
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_implementation_expense_account_id
+#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_implementation_expense_account_id
+msgid ""
+"Expense account charged with the implementation cost when it is provisioned. "
+"Its counterpart is the implementation provision account of the product."
+msgstr ""
+"Cuenta de gasto a la que se carga el costo de implementación cuando se "
+"provisiona. Su contrapartida es la cuenta de provisión de implementación del "
+"producto."
+
+#. module: project_subcontracting
 #: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
 msgid ""
-"Expense accounts the provisions are charged to, and the journal of the "
-"provision entries"
+"Expense accounts and journal of the subcontracting provision entries. The "
+"provision account (a liability) is set on the product or its category."
 msgstr ""
-"Cuentas de gasto a las que se cargan las provisiones y diario de los asientos"
-" de provisión"
+"Cuentas de gasto y diario de los asientos de provisión de la subcontratación."
+" La cuenta de provisión (un pasivo) se define en el producto o en su "
+"categoría."
 
 #. module: project_subcontracting
 #: model_terms:ir.ui.view,arch_db:project_subcontracting.product_template_form_view
@@ -348,8 +357,11 @@ msgstr "Apunte contable"
 #. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_journal_id
 #: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_journal_id
-msgid "Journal of the provision entries."
-msgstr "Diario de los asientos de provisión."
+msgid ""
+"Journal of the provision entries. It must lock posted entries with a hash."
+msgstr ""
+"Diario de los asientos de provisión. Debe bloquear los asientos publicados "
+"con un hash."
 
 #. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_product_product__property_provision_commission_id
@@ -407,11 +419,6 @@ msgstr ""
 "Pagar a cada asignado las horas que registra, con una factura de proveedor"
 
 #. module: project_subcontracting
-#: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
-msgid "Payment Provision"
-msgstr "Provisión del cobro"
-
-#. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_project_task__subcontracting_hour_cost
 msgid ""
 "Price of each hour of this task on the vendor bills that pay its "
@@ -439,12 +446,6 @@ msgstr "Proyecto"
 #: model:ir.module.module,shortdesc:base.module_project_subcontracting
 msgid "Project Subcontracting"
 msgstr "Subcontratación de proyectos"
-
-#. module: project_subcontracting
-#: model:ir.model.fields,field_description:project_subcontracting.field_res_company__provision_journal_id
-#: model:ir.model.fields,field_description:project_subcontracting.field_res_config_settings__provision_journal_id
-msgid "Provision Journal"
-msgstr "Diario de provisiones"
 
 #. module: project_subcontracting
 #: model:ir.model.fields,field_description:project_subcontracting.field_account_account__provision_type
@@ -504,6 +505,30 @@ msgstr ""
 "ajustes de Contabilidad."
 
 #. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_commission_percent
+#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_commission_percent
+msgid ""
+"Share of each customer payment provisioned for the salesperson of the "
+"invoice. They are paid with a draft vendor bill created when the payment is "
+"reconciled."
+msgstr ""
+"Parte de cada cobro de un cliente que se provisiona para el vendedor de la "
+"factura. Se le paga con una factura de proveedor en borrador que se crea al "
+"conciliar el cobro."
+
+#. module: project_subcontracting
+#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_implementation_percent
+#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_implementation_percent
+msgid ""
+"Share of each customer payment provisioned on the analytic account of the "
+"project to pay the hours of the subcontracted implementers. Those hours are "
+"billed from Timesheets > To Bill."
+msgstr ""
+"Parte de cada cobro de un cliente que se provisiona en la cuenta analítica "
+"del proyecto para pagar las horas de los implementadores subcontratados. Esas"
+" horas se facturan desde Hojas de horas > Por facturar."
+
+#. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_account_move_line__provision_commission_percent
 msgid ""
 "Share of the subtotal of this line that provisions the commission of the "
@@ -520,26 +545,6 @@ msgid ""
 msgstr ""
 "Parte del subtotal de esta línea que provisiona el trabajo de implementación "
 "cuando se cobra la factura. Se conserva al publicar la factura."
-
-#. module: project_subcontracting
-#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_implementation_percent
-#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_implementation_percent
-msgid ""
-"Share of what each customer payment brings in that goes to the implementers. "
-"The company keeps the rest as income."
-msgstr ""
-"Parte de lo que trae cada cobro de un cliente que va a los implementadores. "
-"La compañía conserva el resto como ingreso."
-
-#. module: project_subcontracting
-#: model:ir.model.fields,help:project_subcontracting.field_res_company__provision_commission_percent
-#: model:ir.model.fields,help:project_subcontracting.field_res_config_settings__provision_commission_percent
-msgid ""
-"Share of what each customer payment brings in that goes to the salesperson of"
-" the invoice."
-msgstr ""
-"Parte de lo que trae cada cobro de un cliente que va al vendedor de la "
-"factura."
 
 #. module: project_subcontracting
 #: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
@@ -559,6 +564,7 @@ msgstr "Horas subcontratadas por facturar"
 #. module: project_subcontracting
 #: model:ir.model.fields,field_description:project_subcontracting.field_project_project__allow_subcontracting
 #: model:ir.model.fields,field_description:project_subcontracting.field_project_task__allow_subcontracting
+#: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
 msgid "Subcontracting"
 msgstr "Subcontratación"
 
@@ -578,6 +584,12 @@ msgid "Subcontracting Hour Cost"
 msgstr "Costo de subcontratación por hora"
 
 #. module: project_subcontracting
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_company__provision_journal_id
+#: model:ir.model.fields,field_description:project_subcontracting.field_res_config_settings__provision_journal_id
+msgid "Subcontracting Journal"
+msgstr "Diario de subcontratación"
+
+#. module: project_subcontracting
 #. odoo-python
 #: code:addons/project_subcontracting/models/project_project.py:0
 msgid "Subcontracting needs the timesheets of the project: %s"
@@ -587,6 +599,15 @@ msgstr "La subcontratación necesita las hojas de horas del proyecto: %s"
 #: model:ir.model,name:project_subcontracting.model_project_task
 msgid "Task"
 msgstr "Tarea"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/account_move_line.py:0
+msgid ""
+"The analytic distribution of a posted provision entry cannot be changed."
+msgstr ""
+"La distribución analítica de un asiento de provisión publicado no se puede "
+"cambiar."
 
 #. module: project_subcontracting
 #. odoo-python
@@ -641,6 +662,16 @@ msgid ""
 msgstr ""
 "La provisión no cubre esta factura:\n"
 "%s"
+
+#. module: project_subcontracting
+#. odoo-python
+#: code:addons/project_subcontracting/models/res_company.py:0
+msgid ""
+"The provision journal %s must be secured with a hash, so that its entries "
+"cannot be changed."
+msgstr ""
+"El diario de provisión %s debe estar asegurado con hash, para que sus "
+"asientos no se puedan cambiar."
 
 #. module: project_subcontracting
 #. odoo-python
@@ -785,15 +816,6 @@ msgid "Vendor Bills"
 msgstr "Facturas de proveedor"
 
 #. module: project_subcontracting
-#: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
-msgid ""
-"What each customer payment of a product with a provision account sets aside; "
-"the company keeps the rest as income"
-msgstr ""
-"Lo que aparta cada cobro de un producto con cuenta de provisión; la compañía "
-"conserva el resto como ingreso"
-
-#. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_account_account__provision_type
 msgid ""
 "What the balance of this account provisions: the commission of the "
@@ -803,6 +825,17 @@ msgstr ""
 "Qué provisiona el saldo de esta cuenta: la comisión de los vendedores o el "
 "trabajo de implementación. Los productos y las categorías de producto solo "
 "ofrecen las cuentas de su tipo."
+
+#. module: project_subcontracting
+#: model_terms:ir.ui.view,arch_db:project_subcontracting.res_config_settings_view_form
+msgid ""
+"When a customer payment of a product with a provision account is reconciled, "
+"subcontracting sets aside these shares of what was collected (without taxes)."
+" The rest is income of the company."
+msgstr ""
+"Al conciliar un cobro de un cliente por un producto con cuenta de provisión, "
+"la subcontratación aparta estos porcentajes de lo cobrado (sin impuestos). El"
+" resto es ingreso de la compañía."
 
 #. module: project_subcontracting
 #: model:ir.model.fields,help:project_subcontracting.field_product_category__property_provision_commission_categ_id
@@ -856,21 +889,46 @@ msgstr "su tarea no tiene costo de subcontratación por hora"
 msgid "its task is not done"
 msgstr "su tarea no está terminada"
 
-#. module: project_subcontracting
-#. odoo-python
-#: code:addons/project_subcontracting/models/account_move_line.py:0
-msgid ""
-"The analytic distribution of a posted provision entry cannot be changed."
-msgstr ""
-"La distribución analítica de un asiento de provisión publicado no se puede "
-"cambiar."
+#~ msgid "Provision Journal"
+#~ msgstr "Diario de provisiones"
 
-#. module: project_subcontracting
-#. odoo-python
-#: code:addons/project_subcontracting/models/res_company.py:0
-msgid ""
-"The provision journal %s must be secured with a hash, so that its entries "
-"cannot be changed."
-msgstr ""
-"El diario de provisión %s debe estar asegurado con hash, para que sus "
-"asientos no se puedan cambiar."
+#~ msgid "Account charged with the commission when it is provisioned."
+#~ msgstr "Cuenta a la que se carga la comisión cuando se provisiona."
+
+#~ msgid "Account charged with the implementation cost when it is provisioned."
+#~ msgstr ""
+#~ "Cuenta a la que se carga el costo de implementación cuando se provisiona."
+
+#~ msgid ""
+#~ "Expense accounts the provisions are charged to, and the journal of the "
+#~ "provision entries"
+#~ msgstr ""
+#~ "Cuentas de gasto a las que se cargan las provisiones y diario de los asientos"
+#~ " de provisión"
+
+#~ msgid "Journal of the provision entries."
+#~ msgstr "Diario de los asientos de provisión."
+
+#~ msgid "Payment Provision"
+#~ msgstr "Provisión del cobro"
+
+#~ msgid ""
+#~ "Share of what each customer payment brings in that goes to the implementers. "
+#~ "The company keeps the rest as income."
+#~ msgstr ""
+#~ "Parte de lo que trae cada cobro de un cliente que va a los implementadores. "
+#~ "La compañía conserva el resto como ingreso."
+
+#~ msgid ""
+#~ "Share of what each customer payment brings in that goes to the salesperson of"
+#~ " the invoice."
+#~ msgstr ""
+#~ "Parte de lo que trae cada cobro de un cliente que va al vendedor de la "
+#~ "factura."
+
+#~ msgid ""
+#~ "What each customer payment of a product with a provision account sets aside; "
+#~ "the company keeps the rest as income"
+#~ msgstr ""
+#~ "Lo que aparta cada cobro de un producto con cuenta de provisión; la compañía "
+#~ "conserva el resto como ingreso"
