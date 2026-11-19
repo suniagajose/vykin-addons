@@ -7,9 +7,9 @@
         <field name="inherit_id" ref="account.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <block id="invoicing_settings" position="before">
-                <block title="Payment Provision" name="provision_setting_container">
+                <block title="Subcontracting" name="provision_setting_container">
                     <setting id="provision_percents" string="Shares" company_dependent="1"
-                        help="What each customer payment of a product with a provision account sets aside; the company keeps the rest as income">
+                        help="When a customer payment of a product with a provision account is reconciled, subcontracting sets aside these shares of what was collected (without taxes). The rest is income of the company.">
                         <div class="content-group">
                             <div class="row mt8">
                                 <label for="provision_commission_percent" class="col-lg-5 o_light_label"/>
@@ -22,7 +22,7 @@
                         </div>
                     </setting>
                     <setting id="provision_accounting" string="Accounting" company_dependent="1"
-                        help="Expense accounts the provisions are charged to, and the journal of the provision entries">
+                        help="Expense accounts and journal of the subcontracting provision entries. The provision account (a liability) is set on the product or its category.">
                         <div class="content-group">
                             <div class="row mt8">
                                 <label for="provision_commission_expense_account_id" class="col-lg-5 o_light_label"/>

@@ -80,7 +80,7 @@ class TestProvisionConfig(ProvisionCommon):
                 self.assertEqual(company.provision_commission_expense_account_id.with_company(company).code, '601.74.01')
                 self.assertEqual(company.provision_implementation_expense_account_id.with_company(company).code, '501.02.02')
                 self.assertTrue(company.provision_journal_id.restrict_mode_hash_table)
-                self.assertEqual(company.provision_journal_id.name, "Repartos")
+                self.assertEqual(company.provision_journal_id.name, "Subcontratación")
                 self.assertEqual(
                     (company.provision_commission_percent, company.provision_implementation_percent), (20.0, 75.0),
                 )

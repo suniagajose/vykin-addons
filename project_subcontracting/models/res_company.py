@@ -7,24 +7,27 @@ class ResCompany(models.Model):
 
     provision_commission_percent = fields.Float(
         string="Commission %", default=20.0,
-        help="Share of what each customer payment brings in that goes to the salesperson of the invoice.",
+        help="Share of each customer payment provisioned for the salesperson of the invoice. They are paid "
+             "with a draft vendor bill created when the payment is reconciled.",
     )
     provision_implementation_percent = fields.Float(
         string="Implementation %", default=75.0,
-        help="Share of what each customer payment brings in that goes to the implementers. "
-             "The company keeps the rest as income.",
+        help="Share of each customer payment provisioned on the analytic account of the project to pay the "
+             "hours of the subcontracted implementers. Those hours are billed from Timesheets > To Bill.",
     )
     provision_commission_expense_account_id = fields.Many2one(
         'account.account', string="Commission Expense",
-        help="Account charged with the commission when it is provisioned.",
+        help="Expense account charged with the commission when it is provisioned. Its counterpart is the "
+             "commission provision account of the product.",
     )
     provision_implementation_expense_account_id = fields.Many2one(
         'account.account', string="Implementation Cost",
-        help="Account charged with the implementation cost when it is provisioned.",
+        help="Expense account charged with the implementation cost when it is provisioned. Its counterpart is "
+             "the implementation provision account of the product.",
     )
     provision_journal_id = fields.Many2one(
-        'account.journal', string="Provision Journal", domain="[('type', '=', 'general')]",
-        help="Journal of the provision entries.",
+        'account.journal', string="Subcontracting Journal", domain="[('type', '=', 'general')]",
+        help="Journal of the provision entries. It must lock posted entries with a hash.",
     )
 
     @api.constrains('provision_commission_percent', 'provision_implementation_percent')
@@ -105,7 +108,7 @@ class ResCompany(models.Model):
                 or get_account('501.02.02', "Costo de implementación", 'expense_direct_cost')
             )
             company.provision_journal_id = company.provision_journal_id or self.env['account.journal'].create({
-                'name': "Repartos",
+                'name': "Subcontratación",
                 'code': company._get_provision_journal_code(),
                 'type': 'general',
                 'company_id': company.id,
